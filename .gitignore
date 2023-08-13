@@ -22,3 +22,6 @@ go.work
 
 # IDE and other tools directories
 .idea/
+
+# temp directories
+temp/
