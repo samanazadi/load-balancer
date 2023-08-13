@@ -12,6 +12,7 @@ const (
 )
 
 type Config struct {
+	Nodes       []string `json:"nodes"`
 	HealthCheck struct {
 		Active struct {
 			MaxRetry   int `json:"maxRetry"`
