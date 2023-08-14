@@ -1,7 +1,7 @@
-package checker
+package app
 
 import (
-	"github.com/samanazadi/load-balancer/internal/logging"
+	"github.com/samanazadi/load-balancer/pkg/logging"
 	"io"
 	"net"
 	"net/http"

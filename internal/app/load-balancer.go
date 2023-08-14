@@ -1,11 +1,8 @@
-package container
+package app
 
 import (
 	"context"
-	"github.com/samanazadi/load-balancer/internal/checker"
-	"github.com/samanazadi/load-balancer/internal/logging"
-	"github.com/samanazadi/load-balancer/internal/node"
-	"github.com/samanazadi/load-balancer/internal/strategy"
+	"github.com/samanazadi/load-balancer/pkg/logging"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -17,7 +14,7 @@ const RetryCount = iota
 // LoadBalancer is a server pool along a strategy
 type LoadBalancer struct {
 	serverPool ServerPool
-	strategy   strategy.Strategy
+	strategy   Strategy
 }
 
 func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -33,11 +30,11 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, stgy strategy.Strategy,
+func NewLoadBalancer(nodeURLStrings []string, chkr ConnectionChecker, stgy Strategy,
 	maxRetry int, retryDelay int, period int) *LoadBalancer {
 	lb := &LoadBalancer{}
 
-	nodes := make([]*node.Node, 0, len(nodeURLStrings))
+	nodes := make([]*Node, 0, len(nodeURLStrings))
 	for _, nodeURLString := range nodeURLStrings {
 		nodeURL, err := url.Parse(nodeURLString)
 		if err != nil {
@@ -68,7 +65,7 @@ func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, st
 			lb.ServeHTTP(rw, r.WithContext(newCtx))
 		}
 
-		n := node.Node{
+		n := Node{
 			URL:               nodeURL,
 			ReverseProxy:      *rp,
 			ConnectionChecker: chkr,

@@ -1,15 +1,14 @@
-package container
+package app
 
 import (
-	"github.com/samanazadi/load-balancer/internal/logging"
-	"github.com/samanazadi/load-balancer/internal/node"
+	"github.com/samanazadi/load-balancer/pkg/logging"
 	"net/url"
 	"sync"
 	"time"
 )
 
 type ServerPool struct {
-	nodes []*node.Node
+	nodes []*Node
 }
 
 func (p *ServerPool) passiveHealthCheck() {
@@ -64,7 +63,7 @@ func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
 	}
 }
 
-func newServerPool(nodes []*node.Node) ServerPool {
+func newServerPool(nodes []*Node) ServerPool {
 	return ServerPool{
 		nodes: nodes,
 	}

@@ -1,7 +1,6 @@
-package node
+package app
 
 import (
-	"github.com/samanazadi/load-balancer/internal/checker"
 	"net/http/httputil"
 	"net/url"
 	"sync"
@@ -12,7 +11,7 @@ type Node struct {
 	URL               *url.URL
 	alive             bool
 	ReverseProxy      httputil.ReverseProxy
-	ConnectionChecker checker.ConnectionChecker
+	ConnectionChecker ConnectionChecker
 	mux               sync.RWMutex
 }
 

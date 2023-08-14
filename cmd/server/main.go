@@ -2,10 +2,8 @@ package main
 
 import (
 	"github.com/samanazadi/load-balancer/configs"
-	"github.com/samanazadi/load-balancer/internal/checker"
-	"github.com/samanazadi/load-balancer/internal/container"
-	"github.com/samanazadi/load-balancer/internal/logging"
-	"github.com/samanazadi/load-balancer/internal/strategy"
+	"github.com/samanazadi/load-balancer/internal/app"
+	"github.com/samanazadi/load-balancer/pkg/logging"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,25 +19,25 @@ func main() {
 	}
 
 	// checker
-	var chkr checker.ConnectionChecker
+	var chkr app.ConnectionChecker
 	switch config.Checker.Name {
-	case checker.TCP:
-		chkr = checker.TCPChecker{}
+	case app.TCP:
+		chkr = app.TCPChecker{}
 		logging.Logger.Println("checker: TCP checker")
-	case checker.HTTP:
-		chkr = checker.HTTPChecker{}
+	case app.HTTP:
+		chkr = app.HTTPChecker{}
 		logging.Logger.Println("checker: HTTP checker")
 	}
 
 	// strategy
-	var stgy strategy.Strategy
+	var stgy app.Strategy
 	switch config.Strategy.Name {
-	case strategy.RR:
-		stgy = strategy.NewRoundRobin()
+	case app.RR:
+		stgy = app.NewRoundRobin()
 		logging.Logger.Println("strategy: round-robin")
 	}
 
-	lb := container.NewLoadBalancer(config.Nodes, chkr, stgy,
+	lb := app.NewLoadBalancer(config.Nodes, chkr, stgy,
 		config.HealthCheck.Active.MaxRetry, config.HealthCheck.Active.RetryDelay, config.HealthCheck.Passive.Period)
 	http.Handle("/", lb)
 	log.Printf("Load balancer started at port %d", config.Port)
