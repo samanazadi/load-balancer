@@ -46,7 +46,7 @@ func (p *ServerPool) startPassiveHealthCheck() {
 	}()
 }
 
-func (p *ServerPool) SetNodeAlive(nodeURL *url.URL, alive bool) {
+func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
 	for _, node := range p.nodes {
 		if node.URL.String() == nodeURL.String() {
 			node.SetAlive(alive)

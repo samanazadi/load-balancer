@@ -72,7 +72,7 @@ func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 
 			// max retries exceeded
 			logging.Logger.Printf("Active health check, node down, retires exceeded: %s", nodeURL)
-			lb.serverPool.SetNodeAlive(nodeURL, false)
+			lb.serverPool.setNodeAlive(nodeURL, false)
 			newCtx := context.WithValue(r.Context(), RetryCount, 1)
 			lb.ServeHTTP(rw, r.WithContext(newCtx))
 		}
