@@ -25,6 +25,8 @@ func main() {
 	case app.HTTP:
 		checker = app.HTTPChecker{}
 		logging.Logger.Println("checker: HTTP checker")
+	default:
+		logging.Logger.Fatalf("invalid checker: %s", config.Checker.Name)
 	}
 
 	// strategy
@@ -33,6 +35,8 @@ func main() {
 	case app.RR:
 		strategy = app.NewRoundRobin()
 		logging.Logger.Println("strategy: round-robin")
+	default:
+		logging.Logger.Fatalf("invalid strategy: %s", config.Strategy.Name)
 	}
 
 	lb := app.NewLoadBalancer(config.Nodes, checker, strategy,
