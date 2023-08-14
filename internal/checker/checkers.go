@@ -24,8 +24,10 @@ func (c TCPChecker) Check(url *url.URL) bool {
 	timeout := time.Second * time.Duration(configs.Config.HealthCheck.Passive.Timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
 	defer func() {
-		if connErr := conn.Close(); connErr != nil {
-			logging.Logger.Printf("Cannot close connection: %s", url.String())
+		if err == nil {
+			if connErr := conn.Close(); connErr != nil {
+				logging.Logger.Printf("Cannot close connection: %s", url.String())
+			}
 		}
 	}()
 
