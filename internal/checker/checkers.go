@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+const (
+	TCP  = "tcp"
+	HTTP = "http"
+)
+
 // ConnectionChecker checks for establishment of a connection
 type ConnectionChecker interface {
 	Check(*url.URL) bool

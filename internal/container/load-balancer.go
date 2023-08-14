@@ -34,8 +34,18 @@ func (lb *LoadBalancer) StartPassiveHealthCheck() {
 	lb.serverPool.startPassiveHealthCheck()
 }
 
-func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker) *LoadBalancer {
+func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 	lb := &LoadBalancer{}
+
+	var chkr checker.ConnectionChecker
+	switch configs.Config.Checker.Name {
+	case checker.TCP:
+		chkr = checker.TCPChecker{}
+		logging.Logger.Println("Checker: TCP checker")
+	case checker.HTTP:
+		chkr = checker.HTTPChecker{}
+		logging.Logger.Println("Checker: HTTP checker")
+	}
 
 	nodes := make([]*node.Node, 0, len(nodeURLStrings))
 	for _, nodeURLString := range nodeURLStrings {
@@ -70,7 +80,7 @@ func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker)
 		n := node.Node{
 			URL:               nodeURL,
 			ReverseProxy:      *rp,
-			ConnectionChecker: checker,
+			ConnectionChecker: chkr,
 		}
 		n.SetAlive(true)
 		nodes = append(nodes, &n)
