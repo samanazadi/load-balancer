@@ -4,56 +4,58 @@ import (
 	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/app"
 	"github.com/samanazadi/load-balancer/pkg/logging"
-	"log"
 	"net/http"
 	"strconv"
 )
 
 func main() {
-	// Logging
+	// logging
 	logging.Init()
 
 	// config
-	config, err := configs.New()
+	cfg, err := configs.New()
 	if err != nil {
 		logging.Logger.Fatal(err)
 	}
 
 	// checker
 	var checker app.ConnectionChecker
-	switch config.Checker.Name {
+	switch cfg.Checker.Name {
 	case app.TCP:
 		checker = app.TCPChecker{
-			Timeout: config.HealthCheck.Passive.Timeout,
+			Timeout: cfg.HealthCheck.Passive.Timeout,
 		}
 		logging.Logger.Println("checker: TCP checker")
 	case app.HTTP:
-		path, keyPhrase := app.HTTPCheckerParamDecode(config.Checker.Params)
+		path, keyPhrase := app.HTTPCheckerParamDecode(cfg.Checker.Params)
 		checker = app.HTTPChecker{
 			Path:      path,
 			KeyPhrase: keyPhrase,
-			Timeout:   config.HealthCheck.Passive.Timeout,
+			Timeout:   cfg.HealthCheck.Passive.Timeout,
 		}
 		logging.Logger.Println("checker: HTTP checker")
 	default:
-		logging.Logger.Fatalf("invalid checker: %s", config.Checker.Name)
+		logging.Logger.Fatalf("invalid checker: %s", cfg.Checker.Name)
 	}
 
 	// strategy
 	var strategy app.Strategy
-	switch config.Strategy.Name {
+	switch cfg.Strategy.Name {
 	case app.RR:
 		strategy = app.NewRoundRobin()
 		logging.Logger.Println("strategy: round-robin")
 	default:
-		logging.Logger.Fatalf("invalid strategy: %s", config.Strategy.Name)
+		logging.Logger.Fatalf("invalid strategy: %s", cfg.Strategy.Name)
 	}
 
-	lb := app.NewLoadBalancer(config.Nodes, checker, strategy,
-		config.HealthCheck.Active.MaxRetry, config.HealthCheck.Active.RetryDelay, config.HealthCheck.Passive.Period)
+	// load balancer
+	lb := app.NewLoadBalancer(cfg.Nodes, checker, strategy,
+		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
+	logging.Logger.Println("load balancer created")
+
 	http.Handle("/", lb)
-	log.Printf("Load balancer started at port %d", config.Port)
-	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
+	logging.Logger.Printf("load balancer started at port %d", cfg.Port)
+	if err := http.ListenAndServe(":"+strconv.Itoa(cfg.Port), nil); err != nil {
 		logging.Logger.Fatalf("cannot start load balancer: %s", err.Error())
 	}
 }
