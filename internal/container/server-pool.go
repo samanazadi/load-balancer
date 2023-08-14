@@ -14,15 +14,15 @@ type ServerPool struct {
 
 func (p *ServerPool) passiveHealthCheck() {
 	var wg sync.WaitGroup
-	for _, node := range p.nodes {
+	for _, n := range p.nodes {
 		wg.Add(1)
-		node := node
+		n := n
 		go func() {
 			defer wg.Done()
-			alive := node.CheckNodeAlive()
-			if alive != node.IsAlive() {
+			alive := n.CheckNodeAlive()
+			if alive != n.IsAlive() {
 				prev := "down"
-				if node.IsAlive() {
+				if n.IsAlive() {
 					prev = "up"
 				}
 
@@ -31,9 +31,9 @@ func (p *ServerPool) passiveHealthCheck() {
 					now = "up"
 				}
 
-				logging.Logger.Printf("passive health check, %s: %s -> %s", node.URL.String(), prev, now)
+				logging.Logger.Printf("passive health check, %s: %s -> %s", n.URL.String(), prev, now)
 			}
-			node.SetAlive(alive)
+			n.SetAlive(alive)
 		}()
 	}
 	wg.Wait()
@@ -56,9 +56,9 @@ func (p *ServerPool) startPassiveHealthCheck(period int) {
 }
 
 func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
-	for _, node := range p.nodes {
-		if node.URL.String() == nodeURL.String() {
-			node.SetAlive(alive)
+	for _, n := range p.nodes {
+		if n.URL.String() == nodeURL.String() {
+			n.SetAlive(alive)
 			return
 		}
 	}
