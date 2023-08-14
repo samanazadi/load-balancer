@@ -1,7 +1,6 @@
 package container
 
 import (
-	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/logging"
 	"github.com/samanazadi/load-balancer/internal/node"
 	"net/url"
@@ -40,10 +39,10 @@ func (p *ServerPool) passiveHealthCheck() {
 	wg.Wait()
 }
 
-func (p *ServerPool) startPassiveHealthCheck() {
+func (p *ServerPool) startPassiveHealthCheck(period int) {
 	go func() {
 		logging.Logger.Printf("Passive health check daemon started")
-		period := time.Second * time.Duration(configs.Config.HealthCheck.Passive.Period)
+		period := time.Second * time.Duration(period)
 		t := time.NewTicker(period)
 		for {
 			select {

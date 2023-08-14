@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/samanazadi/load-balancer/configs"
+	"github.com/samanazadi/load-balancer/internal/checker"
 	"github.com/samanazadi/load-balancer/internal/container"
 	"github.com/samanazadi/load-balancer/internal/logging"
+	"github.com/samanazadi/load-balancer/internal/strategy"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,10 +14,36 @@ import (
 const roundRobin = "RR"
 
 func main() {
-	lb := container.NewLoadBalancer(configs.Config.Nodes)
+	// logging
+	config, err := configs.New()
+	if err != nil {
+		logging.Logger.Fatal(err)
+	}
+
+	// checker
+	var chkr checker.ConnectionChecker
+	switch config.Checker.Name {
+	case checker.TCP:
+		chkr = checker.TCPChecker{}
+		logging.Logger.Println("Checker: TCP checker")
+	case checker.HTTP:
+		chkr = checker.HTTPChecker{}
+		logging.Logger.Println("Checker: HTTP checker")
+	}
+
+	// strategy
+	var stgy strategy.Strategy
+	switch config.Strategy.Name {
+	case strategy.RR:
+		stgy = strategy.NewRoundRobin()
+		logging.Logger.Println("Strategy: round-robin")
+	}
+
+	lb := container.NewLoadBalancer(config.Nodes, chkr, stgy,
+		config.HealthCheck.Active.MaxRetry, config.HealthCheck.Active.RetryDelay, config.HealthCheck.Passive.Period)
 	http.Handle("/", lb)
-	log.Printf("Load balancer started at port %d", configs.Config.Port)
-	if err := http.ListenAndServe(":"+strconv.Itoa(configs.Config.Port), nil); err != nil {
+	log.Printf("Load balancer started at port %d", config.Port)
+	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
 		logging.Logger.Fatalf("Cannot start load balancer: %s", err.Error())
 	}
 }

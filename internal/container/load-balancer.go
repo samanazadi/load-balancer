@@ -2,7 +2,6 @@ package container
 
 import (
 	"context"
-	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/checker"
 	"github.com/samanazadi/load-balancer/internal/logging"
 	"github.com/samanazadi/load-balancer/internal/node"
@@ -30,22 +29,13 @@ func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	http.Error(rw, "Service not available", http.StatusServiceUnavailable)
 }
 
-func (lb *LoadBalancer) StartPassiveHealthCheck() {
-	lb.serverPool.startPassiveHealthCheck()
+func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
+	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
+func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, stgy strategy.Strategy,
+	maxRetry int, retryDelay int, period int) *LoadBalancer {
 	lb := &LoadBalancer{}
-
-	var chkr checker.ConnectionChecker
-	switch configs.Config.Checker.Name {
-	case checker.TCP:
-		chkr = checker.TCPChecker{}
-		logging.Logger.Println("Checker: TCP checker")
-	case checker.HTTP:
-		chkr = checker.HTTPChecker{}
-		logging.Logger.Println("Checker: HTTP checker")
-	}
 
 	nodes := make([]*node.Node, 0, len(nodeURLStrings))
 	for _, nodeURLString := range nodeURLStrings {
@@ -58,10 +48,11 @@ func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 		rp := httputil.NewSingleHostReverseProxy(nodeURL)
 		rp.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, e error) { // Active health check
 			retries := getRetryCountFromContext(r)
-			logging.Logger.Printf("Active health check, node down, %d retires: %s (%s)", retries, nodeURL, e.Error())
-			if retries < configs.Config.HealthCheck.Active.MaxRetry {
+			logging.Logger.Printf("Active health check, node down, %d retires: %s (%s)",
+				retries, nodeURL, e.Error())
+			if retries < maxRetry {
 				// same node, more retries after some delay
-				retryDelay := time.Millisecond * time.Duration(configs.Config.HealthCheck.Active.RetryDelay)
+				retryDelay := time.Millisecond * time.Duration(retryDelay)
 				select {
 				case <-time.After(retryDelay):
 					ctx := context.WithValue(r.Context(), RetryCount, retries+1)
@@ -88,16 +79,10 @@ func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 	}
 
 	lb.serverPool = newServerPool(nodes)
-
-	var stgy strategy.Strategy
-	switch configs.Config.Strategy.Name {
-	case strategy.RR:
-		stgy = strategy.NewRoundRobin(nodes)
-		logging.Logger.Println("Strategy: round-robin")
-	}
+	stgy.SetNodes(nodes)
 	lb.strategy = stgy
 
-	lb.StartPassiveHealthCheck()
+	lb.StartPassiveHealthCheck(period)
 
 	return lb
 }

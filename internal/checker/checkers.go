@@ -1,7 +1,6 @@
 package checker
 
 import (
-	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/logging"
 	"io"
 	"net"
@@ -22,11 +21,12 @@ type ConnectionChecker interface {
 }
 
 type TCPChecker struct {
+	timeout int
 }
 
 // Check checks for a destinations by establishing a tcp connection. Should be thread-safe.
 func (c TCPChecker) Check(url *url.URL) bool {
-	timeout := time.Second * time.Duration(configs.Config.HealthCheck.Passive.Timeout)
+	timeout := time.Second * time.Duration(c.timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
 	defer func() {
 		if err == nil {
@@ -40,16 +40,16 @@ func (c TCPChecker) Check(url *url.URL) bool {
 }
 
 type HTTPChecker struct {
+	path      string
+	keyPhrase string
+	timeout   int
 }
 
 func (c HTTPChecker) Check(url *url.URL) bool {
-	path := configs.Config.Checker.Params["httpChecker"].(map[string]any)["path"].(string)
-	keyPhrase := configs.Config.Checker.Params["httpChecker"].(map[string]any)["keyPhrase"].(string)
-
 	client := http.Client{
-		Timeout: time.Second * time.Duration(configs.Config.HealthCheck.Passive.Timeout),
+		Timeout: time.Second * time.Duration(c.timeout),
 	}
-	res, err := client.Get(url.String() + path)
+	res, err := client.Get(url.String() + c.path)
 	if err != nil {
 		return false
 	}
@@ -67,5 +67,5 @@ func (c HTTPChecker) Check(url *url.URL) bool {
 		return false
 	}
 
-	return strings.Contains(string(body), keyPhrase)
+	return strings.Contains(string(body), c.keyPhrase)
 }

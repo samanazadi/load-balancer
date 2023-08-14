@@ -38,9 +38,12 @@ func (rr *RoundRobin) GetNextEligibleNode(*http.Request) *node.Node {
 	return nil // no available node
 }
 
-func NewRoundRobin(nodes []*node.Node) Strategy {
+func (rr *RoundRobin) SetNodes(nodes []*node.Node) {
+	rr.Nodes = nodes
+}
+
+func NewRoundRobin() Strategy {
 	return &RoundRobin{
 		lastUsedIndex: -1,
-		Nodes:         nodes,
 	}
 }

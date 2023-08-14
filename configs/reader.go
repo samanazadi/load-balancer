@@ -2,7 +2,7 @@ package configs
 
 import (
 	"encoding/json"
-	"github.com/samanazadi/load-balancer/internal/logging"
+	"fmt"
 	"os"
 )
 
@@ -12,7 +12,7 @@ const (
 	checkerPath  = "/etc/load-balancer/checker.json"
 )
 
-type config struct {
+type Config struct {
 	Port        int      `json:"port"`
 	Nodes       []string `json:"nodes"`
 	HealthCheck struct {
@@ -35,30 +35,28 @@ type config struct {
 	} `json:"checker"`
 }
 
-var Config config
-
-func read() config {
-	var config config
+func New() (*Config, error) {
+	var config Config
 
 	// read config.json file
 	configBytes, err := os.ReadFile(configPath)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot read config file: %s", err.Error())
+		return nil, fmt.Errorf("cannot read config file: %s", err.Error())
 	}
 	err = json.Unmarshal(configBytes, &config)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot unmarshal config file: %s", err.Error())
+		return nil, fmt.Errorf("cannot unmarshal config file: %s", err.Error())
 	}
 
 	// read strategy.json file
 	var strategyParams map[string]any
 	strategyBytes, err := os.ReadFile(strategyPath)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot read strategy file: %s", err.Error())
+		return nil, fmt.Errorf("cannot read strategy file: %s", err.Error())
 	}
 	err = json.Unmarshal(strategyBytes, &strategyParams)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot unmarshal strategy file: %s", err.Error())
+		return nil, fmt.Errorf("cannot unmarshal strategy file: %s", err.Error())
 	}
 	config.Strategy.Params = strategyParams
 
@@ -66,17 +64,13 @@ func read() config {
 	var checkerParams map[string]any
 	checkerBytes, err := os.ReadFile(checkerPath)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot read checker file: %s", err.Error())
+		return nil, fmt.Errorf("cannot read checker file: %s", err.Error())
 	}
 	err = json.Unmarshal(checkerBytes, &checkerParams)
 	if err != nil {
-		logging.Logger.Fatalf("Cannot unmarshal checker file: %s", err.Error())
+		return nil, fmt.Errorf("cannot unmarshal checker file: %s", err.Error())
 	}
 	config.Checker.Params = checkerParams
 
-	return config
-}
-
-func init() {
-	Config = read()
+	return &config, nil
 }
