@@ -11,13 +11,13 @@ const (
 	strategyPath = "/etc/load-balancer/strategy.json"
 )
 
-type Config struct {
+type config struct {
+	Port        int      `json:"port"`
 	Nodes       []string `json:"nodes"`
 	HealthCheck struct {
 		Active struct {
 			MaxRetry   int `json:"maxRetry"`
 			RetryDelay int `json:"retryDelay"`
-			MaxAttempt int `json:"maxAttempt"`
 		} `json:"active"`
 		Passive struct {
 			Period  int `json:"period"`
@@ -30,8 +30,10 @@ type Config struct {
 	} `json:"strategy"`
 }
 
-func Read() Config {
-	var config Config
+var Config config
+
+func read() config {
+	var config config
 
 	// read config.json file
 	configBytes, err := os.ReadFile(configPath)
@@ -56,4 +58,8 @@ func Read() Config {
 	config.Strategy.Params = strategyParams
 
 	return config
+}
+
+func init() {
+	Config = read()
 }
