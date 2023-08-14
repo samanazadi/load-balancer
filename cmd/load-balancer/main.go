@@ -5,14 +5,15 @@ import (
 	"github.com/samanazadi/load-balancer/internal/checker"
 	"github.com/samanazadi/load-balancer/internal/container"
 	"github.com/samanazadi/load-balancer/internal/logging"
-	"github.com/samanazadi/load-balancer/internal/strategy"
 	"log"
 	"net/http"
 	"strconv"
 )
 
+const roundRobin = "RR"
+
 func main() {
-	lb := container.NewLoadBalancer(configs.Config.Nodes, checker.HTTPChecker{}, strategy.RR)
+	lb := container.NewLoadBalancer(configs.Config.Nodes, checker.HTTPChecker{})
 	lb.StartPassiveHealthCheck()
 	http.Handle("/", lb)
 	log.Printf("Load balancer started at port %d", configs.Config.Port)

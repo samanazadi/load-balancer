@@ -34,7 +34,7 @@ func (lb *LoadBalancer) StartPassiveHealthCheck() {
 	lb.serverPool.startPassiveHealthCheck()
 }
 
-func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker, s int) *LoadBalancer {
+func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker) *LoadBalancer {
 	lb := &LoadBalancer{}
 
 	nodes := make([]*node.Node, 0, len(nodeURLStrings))
@@ -80,7 +80,7 @@ func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker,
 	lb.serverPool = newServerPool(nodes)
 
 	var stgy strategy.Strategy
-	switch s {
+	switch configs.Config.Strategy.Name {
 	case strategy.RR:
 		stgy = strategy.NewRoundRobin(nodes)
 	}

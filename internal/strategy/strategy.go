@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	RR = iota
+	RR = "rr"
 )
 
 // Strategy is a balancing strategy like round-robin and consistent hashing
