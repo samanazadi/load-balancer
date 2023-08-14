@@ -21,12 +21,12 @@ type ConnectionChecker interface {
 }
 
 type TCPChecker struct {
-	timeout int
+	Timeout int
 }
 
 // Check checks for a destinations by establishing a tcp connection. Should be thread-safe.
 func (c TCPChecker) Check(url *url.URL) bool {
-	timeout := time.Second * time.Duration(c.timeout)
+	timeout := time.Second * time.Duration(c.Timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
 	defer func() {
 		if err == nil {
@@ -40,16 +40,16 @@ func (c TCPChecker) Check(url *url.URL) bool {
 }
 
 type HTTPChecker struct {
-	path      string
-	keyPhrase string
-	timeout   int
+	Path      string
+	KeyPhrase string
+	Timeout   int
 }
 
 func (c HTTPChecker) Check(url *url.URL) bool {
 	client := http.Client{
-		Timeout: time.Second * time.Duration(c.timeout),
+		Timeout: time.Second * time.Duration(c.Timeout),
 	}
-	res, err := client.Get(url.String() + c.path)
+	res, err := client.Get(url.String() + c.Path)
 	if err != nil {
 		return false
 	}
@@ -67,5 +67,11 @@ func (c HTTPChecker) Check(url *url.URL) bool {
 		return false
 	}
 
-	return strings.Contains(string(body), c.keyPhrase)
+	return strings.Contains(string(body), c.KeyPhrase)
+}
+
+func HTTPCheckerParamDecode(m map[string]any) (path, keyPhrase string) {
+	path = m["path"].(string)
+	keyPhrase = m["keyPhrase"].(string)
+	return
 }

@@ -20,10 +20,17 @@ func main() {
 	var checker app.ConnectionChecker
 	switch config.Checker.Name {
 	case app.TCP:
-		checker = app.TCPChecker{}
+		checker = app.TCPChecker{
+			Timeout: config.HealthCheck.Passive.Timeout,
+		}
 		logging.Logger.Println("checker: TCP checker")
 	case app.HTTP:
-		checker = app.HTTPChecker{}
+		path, keyPhrase := app.HTTPCheckerParamDecode(config.Checker.Params)
+		checker = app.HTTPChecker{
+			Path:      path,
+			KeyPhrase: keyPhrase,
+			Timeout:   config.HealthCheck.Passive.Timeout,
+		}
 		logging.Logger.Println("checker: HTTP checker")
 	default:
 		logging.Logger.Fatalf("invalid checker: %s", config.Checker.Name)
