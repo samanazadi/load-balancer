@@ -19,25 +19,25 @@ func main() {
 	}
 
 	// checker
-	var chkr app.ConnectionChecker
+	var checker app.ConnectionChecker
 	switch config.Checker.Name {
 	case app.TCP:
-		chkr = app.TCPChecker{}
+		checker = app.TCPChecker{}
 		logging.Logger.Println("checker: TCP checker")
 	case app.HTTP:
-		chkr = app.HTTPChecker{}
+		checker = app.HTTPChecker{}
 		logging.Logger.Println("checker: HTTP checker")
 	}
 
 	// strategy
-	var stgy app.Strategy
+	var strategy app.Strategy
 	switch config.Strategy.Name {
 	case app.RR:
-		stgy = app.NewRoundRobin()
+		strategy = app.NewRoundRobin()
 		logging.Logger.Println("strategy: round-robin")
 	}
 
-	lb := app.NewLoadBalancer(config.Nodes, chkr, stgy,
+	lb := app.NewLoadBalancer(config.Nodes, checker, strategy,
 		config.HealthCheck.Active.MaxRetry, config.HealthCheck.Active.RetryDelay, config.HealthCheck.Passive.Period)
 	http.Handle("/", lb)
 	log.Printf("Load balancer started at port %d", config.Port)
