@@ -9,8 +9,6 @@ import (
 	"strconv"
 )
 
-const roundRobin = "RR"
-
 func main() {
 	// logging
 	config, err := configs.New()
