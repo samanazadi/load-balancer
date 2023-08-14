@@ -53,9 +53,14 @@ func main() {
 		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
 	logging.Logger.Println("load balancer created")
 
-	http.Handle("/", lb)
+	server := &http.Server{
+		Addr:    ":" + strconv.Itoa(cfg.Port),
+		Handler: lb,
+	}
+
 	logging.Logger.Printf("load balancer started at port %d", cfg.Port)
-	if err := http.ListenAndServe(":"+strconv.Itoa(cfg.Port), nil); err != nil {
+
+	if err := server.ListenAndServe(); err != nil {
 		logging.Logger.Fatalf("cannot start load balancer: %s", err.Error())
 	}
 }
