@@ -66,16 +66,15 @@ func NewLoadBalancer(nodeURLStrings []string, checker ConnectionChecker, strateg
 		}
 
 		n := Node{
-			URL:               nodeURL,
-			ReverseProxy:      *rp,
-			ConnectionChecker: checker,
+			URL:          nodeURL,
+			ReverseProxy: *rp,
 		}
 		n.SetAlive(true)
 		nodes = append(nodes, &n)
 		logging.Logger.Printf("node added: %s", nodeURLString)
 	}
 
-	lb.serverPool = newServerPool(nodes)
+	lb.serverPool = newServerPool(nodes, checker)
 	strategy.SetNodes(nodes)
 	lb.strategy = strategy
 

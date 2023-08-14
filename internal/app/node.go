@@ -8,11 +8,10 @@ import (
 
 // Node is a single backend server
 type Node struct {
-	URL               *url.URL
-	alive             bool
-	ReverseProxy      httputil.ReverseProxy
-	ConnectionChecker ConnectionChecker
-	mux               sync.RWMutex
+	URL          *url.URL
+	alive        bool
+	ReverseProxy httputil.ReverseProxy
+	mux          sync.RWMutex
 }
 
 func (n *Node) SetAlive(alive bool) {
@@ -25,8 +24,4 @@ func (n *Node) IsAlive() bool {
 	n.mux.RLock()
 	defer n.mux.RUnlock()
 	return n.alive
-}
-
-func (n *Node) CheckNodeAlive() bool {
-	return n.ConnectionChecker.Check(n.URL)
 }
