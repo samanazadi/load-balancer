@@ -93,6 +93,7 @@ func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 	switch configs.Config.Strategy.Name {
 	case strategy.RR:
 		stgy = strategy.NewRoundRobin(nodes)
+		logging.Logger.Println("Strategy: round-robin")
 	}
 	lb.strategy = stgy
 	return lb
