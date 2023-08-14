@@ -4,6 +4,6 @@ import "log"
 
 var Logger *log.Logger
 
-func init() {
+func Init() {
 	Logger = log.Default()
 }
