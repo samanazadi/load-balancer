@@ -17,6 +17,7 @@ type LoadBalancer struct {
 	strategy   Strategy
 }
 
+// ServeHTTP route request based on strategy
 func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if n := lb.strategy.GetNextEligibleNode(r); n != nil {
 		n.ReverseProxy.ServeHTTP(rw, r)
@@ -26,6 +27,7 @@ func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	http.Error(rw, "Service not available", http.StatusServiceUnavailable)
 }
 
+// StartPassiveHealthCheck starts passive health check daemon
 func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }

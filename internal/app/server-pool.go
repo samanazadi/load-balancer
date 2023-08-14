@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// ServerPool manage servers
 type ServerPool struct {
 	nodes             []*Node
 	ConnectionChecker ConnectionChecker

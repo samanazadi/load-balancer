@@ -5,5 +5,5 @@ import "log"
 var Logger *log.Logger
 
 func Init() {
-	Logger = log.Default()
+	Logger = log.Default() // a customized logger can be used
 }

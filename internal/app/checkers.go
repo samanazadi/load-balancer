@@ -20,11 +20,11 @@ type ConnectionChecker interface {
 	Check(*url.URL) bool
 }
 
+// TCPChecker checks by establishing a tcp connection.
 type TCPChecker struct {
 	Timeout int
 }
 
-// Check checks for a destinations by establishing a tcp connection. Should be thread-safe.
 func (c TCPChecker) Check(url *url.URL) bool {
 	timeout := time.Second * time.Duration(c.Timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
@@ -39,6 +39,7 @@ func (c TCPChecker) Check(url *url.URL) bool {
 	return err == nil
 }
 
+// HTTPChecker checks by making a get HTTP request
 type HTTPChecker struct {
 	Path      string
 	KeyPhrase string

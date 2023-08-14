@@ -11,7 +11,7 @@ type Node struct {
 	URL          *url.URL
 	alive        bool
 	ReverseProxy httputil.ReverseProxy
-	mux          sync.RWMutex
+	mux          sync.RWMutex // for protecting alive
 }
 
 func (n *Node) SetAlive(alive bool) {
