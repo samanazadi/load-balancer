@@ -12,27 +12,37 @@ const (
 	checkerPath  = "/etc/load-balancer/checker.json"
 )
 
+type ActiveHealthCheck struct {
+	MaxRetry   int `json:"maxRetry"`
+	RetryDelay int `json:"retryDelay"`
+}
+
+type PassiveHealthCheck struct {
+	Period  int `json:"period"`
+	Timeout int `json:"timeout"`
+}
+
+type HealthCheck struct {
+	Active  ActiveHealthCheck  `json:"active"`
+	Passive PassiveHealthCheck `json:"passive"`
+}
+
+type Strategy struct {
+	Name   string         `json:"name"`
+	Params map[string]any `json:"-,"`
+}
+
+type Checker struct {
+	Name   string         `json:"name"`
+	Params map[string]any `json:"-,"`
+}
+
 type Config struct {
-	Port        int      `json:"port"`
-	Nodes       []string `json:"nodes"`
-	HealthCheck struct {
-		Active struct {
-			MaxRetry   int `json:"maxRetry"`
-			RetryDelay int `json:"retryDelay"`
-		} `json:"active"`
-		Passive struct {
-			Period  int `json:"period"`
-			Timeout int `json:"timeout"`
-		} `json:"passive"`
-	} `json:"healthCheck"`
-	Strategy struct {
-		Name   string `json:"name"`
-		Params map[string]any
-	} `json:"strategy"`
-	Checker struct {
-		Name   string `json:"name"`
-		Params map[string]any
-	} `json:"checker"`
+	Port        int         `json:"port"`
+	Nodes       []string    `json:"nodes"`
+	HealthCheck HealthCheck `json:"healthCheck"`
+	Strategy    Strategy    `json:"strategy"`
+	Checker     Checker     `json:"checker"`
 }
 
 func New() (*Config, error) {
