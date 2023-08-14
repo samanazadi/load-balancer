@@ -21,10 +21,20 @@ func (p *ServerPool) passiveHealthCheck() {
 		go func() {
 			defer wg.Done()
 			alive := node.CheckNodeAlive()
-			node.SetAlive(alive)
-			if !alive {
-				logging.Logger.Printf("Passive health check, node down: %s", node.URL.String())
+			if alive != node.IsAlive() {
+				prev := "down"
+				if node.IsAlive() {
+					prev = "up"
+				}
+
+				now := "down"
+				if alive {
+					now = "up"
+				}
+
+				logging.Logger.Printf("Passive health check, %s: %s -> %s", node.URL.String(), prev, now)
 			}
+			node.SetAlive(alive)
 		}()
 	}
 	wg.Wait()
