@@ -59,28 +59,31 @@ func New() (*Config, error) {
 	}
 
 	// read strategy.json file
-	var strategyParams map[string]any
-	strategyBytes, err := os.ReadFile(strategyPath)
+	params, err := readConfigFile(strategyPath, "strategy")
 	if err != nil {
-		return nil, fmt.Errorf("cannot read strategy file: %s", err.Error())
+		return nil, err
+	}
+	config.Strategy.Params = params
+
+	// read checker.json file
+	params, err = readConfigFile(checkerPath, "checker")
+	if err != nil {
+		return nil, err
+	}
+	config.Checker.Params = params
+
+	return &config, nil
+}
+
+func readConfigFile(path string, configType string) (map[string]any, error) {
+	var strategyParams map[string]any
+	strategyBytes, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read %s file: %s", configType, err.Error())
 	}
 	err = json.Unmarshal(strategyBytes, &strategyParams)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal strategy file: %s", err.Error())
+		return nil, fmt.Errorf("cannot unmarshal %s file: %s", configType, err.Error())
 	}
-	config.Strategy.Params = strategyParams
-
-	// read checker.json file
-	var checkerParams map[string]any
-	checkerBytes, err := os.ReadFile(checkerPath)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read checker file: %s", err.Error())
-	}
-	err = json.Unmarshal(checkerBytes, &checkerParams)
-	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal checker file: %s", err.Error())
-	}
-	config.Checker.Params = checkerParams
-
-	return &config, nil
+	return strategyParams, nil
 }
