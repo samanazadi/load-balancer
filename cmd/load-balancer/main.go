@@ -13,7 +13,6 @@ const roundRobin = "RR"
 
 func main() {
 	lb := container.NewLoadBalancer(configs.Config.Nodes)
-	lb.StartPassiveHealthCheck()
 	http.Handle("/", lb)
 	log.Printf("Load balancer started at port %d", configs.Config.Port)
 	if err := http.ListenAndServe(":"+strconv.Itoa(configs.Config.Port), nil); err != nil {

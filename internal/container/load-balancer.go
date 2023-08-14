@@ -96,6 +96,9 @@ func NewLoadBalancer(nodeURLStrings []string) *LoadBalancer {
 		logging.Logger.Println("Strategy: round-robin")
 	}
 	lb.strategy = stgy
+
+	lb.StartPassiveHealthCheck()
+
 	return lb
 }
 
