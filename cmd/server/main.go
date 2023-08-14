@@ -25,10 +25,10 @@ func main() {
 	switch config.Checker.Name {
 	case checker.TCP:
 		chkr = checker.TCPChecker{}
-		logging.Logger.Println("Checker: TCP checker")
+		logging.Logger.Println("checker: TCP checker")
 	case checker.HTTP:
 		chkr = checker.HTTPChecker{}
-		logging.Logger.Println("Checker: HTTP checker")
+		logging.Logger.Println("checker: HTTP checker")
 	}
 
 	// strategy
@@ -36,7 +36,7 @@ func main() {
 	switch config.Strategy.Name {
 	case strategy.RR:
 		stgy = strategy.NewRoundRobin()
-		logging.Logger.Println("Strategy: round-robin")
+		logging.Logger.Println("strategy: round-robin")
 	}
 
 	lb := container.NewLoadBalancer(config.Nodes, chkr, stgy,
@@ -44,6 +44,6 @@ func main() {
 	http.Handle("/", lb)
 	log.Printf("Load balancer started at port %d", config.Port)
 	if err := http.ListenAndServe(":"+strconv.Itoa(config.Port), nil); err != nil {
-		logging.Logger.Fatalf("Cannot start load balancer: %s", err.Error())
+		logging.Logger.Fatalf("cannot start load balancer: %s", err.Error())
 	}
 }

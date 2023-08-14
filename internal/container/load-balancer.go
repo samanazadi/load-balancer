@@ -25,7 +25,7 @@ func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		n.ReverseProxy.ServeHTTP(rw, r)
 		return
 	}
-	logging.Logger.Println("No node is available")
+	logging.Logger.Println("no node is available")
 	http.Error(rw, "Service not available", http.StatusServiceUnavailable)
 }
 
@@ -41,14 +41,14 @@ func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, st
 	for _, nodeURLString := range nodeURLStrings {
 		nodeURL, err := url.Parse(nodeURLString)
 		if err != nil {
-			logging.Logger.Printf("Cannot parse node URL: %s", nodeURLString)
+			logging.Logger.Printf("cannot parse node URL: %s", nodeURLString)
 			continue
 		}
 
 		rp := httputil.NewSingleHostReverseProxy(nodeURL)
 		rp.ErrorHandler = func(rw http.ResponseWriter, r *http.Request, e error) { // Active health check
 			retries := getRetryCountFromContext(r)
-			logging.Logger.Printf("Active health check, node down, %d retires: %s (%s)",
+			logging.Logger.Printf("active health check, node down, %d retires: %s (%s)",
 				retries, nodeURL, e.Error())
 			if retries < maxRetry {
 				// same node, more retries after some delay
@@ -62,7 +62,7 @@ func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, st
 			}
 
 			// max retries exceeded
-			logging.Logger.Printf("Active health check, node down, retires exceeded: %s", nodeURL)
+			logging.Logger.Printf("active health check, node down, retires exceeded: %s", nodeURL)
 			lb.serverPool.setNodeAlive(nodeURL, false)
 			newCtx := context.WithValue(r.Context(), RetryCount, 1)
 			lb.ServeHTTP(rw, r.WithContext(newCtx))
@@ -75,7 +75,7 @@ func NewLoadBalancer(nodeURLStrings []string, chkr checker.ConnectionChecker, st
 		}
 		n.SetAlive(true)
 		nodes = append(nodes, &n)
-		logging.Logger.Printf("Node added: %s", nodeURLString)
+		logging.Logger.Printf("node added: %s", nodeURLString)
 	}
 
 	lb.serverPool = newServerPool(nodes)

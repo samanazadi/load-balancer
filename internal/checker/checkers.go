@@ -31,7 +31,7 @@ func (c TCPChecker) Check(url *url.URL) bool {
 	defer func() {
 		if err == nil {
 			if connErr := conn.Close(); connErr != nil {
-				logging.Logger.Printf("Cannot close connection: %s", url.String())
+				logging.Logger.Printf("cannot close connection: %s", url.String())
 			}
 		}
 	}()
@@ -58,7 +58,7 @@ func (c HTTPChecker) Check(url *url.URL) bool {
 	defer func() {
 		err = res.Body.Close()
 		if err != nil {
-			logging.Logger.Printf("Cannot close body: %s", url.String())
+			logging.Logger.Printf("cannot close body: %s", url.String())
 		}
 	}()
 

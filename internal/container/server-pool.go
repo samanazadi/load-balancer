@@ -31,7 +31,7 @@ func (p *ServerPool) passiveHealthCheck() {
 					now = "up"
 				}
 
-				logging.Logger.Printf("Passive health check, %s: %s -> %s", node.URL.String(), prev, now)
+				logging.Logger.Printf("passive health check, %s: %s -> %s", node.URL.String(), prev, now)
 			}
 			node.SetAlive(alive)
 		}()
@@ -41,15 +41,15 @@ func (p *ServerPool) passiveHealthCheck() {
 
 func (p *ServerPool) startPassiveHealthCheck(period int) {
 	go func() {
-		logging.Logger.Printf("Passive health check daemon started")
+		logging.Logger.Printf("passive health check daemon started")
 		period := time.Second * time.Duration(period)
 		t := time.NewTicker(period)
 		for {
 			select {
 			case <-t.C:
-				logging.Logger.Println("Passive health check is starting...")
+				logging.Logger.Println("passive health check is starting...")
 				p.passiveHealthCheck()
-				logging.Logger.Println("Passive health check completed")
+				logging.Logger.Println("passive health check completed")
 			}
 		}
 	}()
