@@ -16,11 +16,11 @@ type ConnectionChecker interface {
 	Check(*url.URL) bool
 }
 
-type NetChecker struct {
+type TCPChecker struct {
 }
 
 // Check checks for a destinations by establishing a tcp connection. Should be thread-safe.
-func (c NetChecker) Check(url *url.URL) bool {
+func (c TCPChecker) Check(url *url.URL) bool {
 	timeout := time.Second * time.Duration(configs.Config.HealthCheck.Passive.Timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
 	defer func() {
