@@ -36,10 +36,13 @@ type HTTPChecker struct {
 }
 
 func (c HTTPChecker) Check(url *url.URL) bool {
+	path := configs.Config.Checker.Params["httpChecker"].(map[string]any)["path"].(string)
+	keyPhrase := configs.Config.Checker.Params["httpChecker"].(map[string]any)["keyPhrase"].(string)
+
 	client := http.Client{
 		Timeout: time.Second * time.Duration(configs.Config.HealthCheck.Passive.Timeout),
 	}
-	res, err := client.Get(url.String() + "/ping")
+	res, err := client.Get(url.String() + path)
 	if err != nil {
 		return false
 	}
@@ -57,5 +60,5 @@ func (c HTTPChecker) Check(url *url.URL) bool {
 		return false
 	}
 
-	return strings.Contains(string(body), "pong")
+	return strings.Contains(string(body), keyPhrase)
 }

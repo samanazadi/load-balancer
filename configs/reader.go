@@ -9,6 +9,7 @@ import (
 const (
 	configPath   = "/etc/load-balancer/config.json"
 	strategyPath = "/etc/load-balancer/strategy.json"
+	checkerPath  = "/etc/load-balancer/checker.json"
 )
 
 type config struct {
@@ -28,6 +29,10 @@ type config struct {
 		Name   string `json:"name"`
 		Params map[string]any
 	} `json:"strategy"`
+	Checker struct {
+		Name   string `json:"name"`
+		Params map[string]any
+	} `json:"checker"`
 }
 
 var Config config
@@ -56,6 +61,18 @@ func read() config {
 		logging.Logger.Fatalf("Cannot unmarshal strategy file: %s", err.Error())
 	}
 	config.Strategy.Params = strategyParams
+
+	// read checker.json file
+	var checkerParams map[string]any
+	checkerBytes, err := os.ReadFile(checkerPath)
+	if err != nil {
+		logging.Logger.Fatalf("Cannot read checker file: %s", err.Error())
+	}
+	err = json.Unmarshal(checkerBytes, &checkerParams)
+	if err != nil {
+		logging.Logger.Fatalf("Cannot unmarshal checker file: %s", err.Error())
+	}
+	config.Checker.Params = checkerParams
 
 	return config
 }
