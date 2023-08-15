@@ -105,3 +105,17 @@ func TestContextRetryCount(t *testing.T) {
 		t.Errorf("getRetryCountFromContext(request with RetryCount = %d) = %d, want %d", want, got, want)
 	}
 }
+
+func TestAliveMethods(t *testing.T) {
+	urlStr := "localhost:8001"
+	uu, _ := url.Parse(urlStr)
+	node := New(uu, false, nil, nil)
+	node.SetAlive(node.IsAlive()) // no change
+
+	if node.IsAlive() {
+		t.Error("Node.IsAlive() = false")
+	}
+	if node.URL.String() != urlStr {
+		t.Error("Node.IsAlive() changed URL")
+	}
+}
