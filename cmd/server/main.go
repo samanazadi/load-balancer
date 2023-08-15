@@ -35,8 +35,7 @@ func main() {
 	}
 
 	// load balancer
-	lb := app.New(cfg.Nodes, chk, alg,
-		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
+	lb := app.New(cfg, chk, alg)
 	logging.Logger.Println("load balancer created")
 
 	server := &http.Server{

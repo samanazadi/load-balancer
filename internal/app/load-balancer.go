@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/algorithm"
 	"github.com/samanazadi/load-balancer/internal/checker"
 	"github.com/samanazadi/load-balancer/internal/models/node"
@@ -35,12 +36,15 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func New(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm.Algorithm,
-	maxRetry int, retryDelay int, period int) *LoadBalancer {
+func New(cfg *configs.Config, chk *checker.ConnectionChecker, alg *algorithm.Algorithm) *LoadBalancer {
+
+	// cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period
+	// maxRetry int, retryDelay int, period int
+
 	lb := &LoadBalancer{}
 
-	nodes := make([]*node.Node, 0, len(nodeURLStrings))
-	for _, nodeURLString := range nodeURLStrings {
+	nodes := make([]*node.Node, 0, len(cfg.Nodes))
+	for _, nodeURLString := range cfg.Nodes {
 		nodeURL, err := url.Parse(nodeURLString)
 		if err != nil {
 			logging.Logger.Printf("cannot parse node URL: %s", nodeURLString)
@@ -52,9 +56,9 @@ func New(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm
 			retries := getRetryCountFromContext(r)
 			logging.Logger.Printf("active health check, node down, %d retires: %s (%s)",
 				retries, nodeURL, e.Error())
-			if retries < maxRetry {
+			if retries < cfg.HealthCheck.Active.MaxRetry {
 				// same node, more retries after some delay
-				retryDelay := time.Millisecond * time.Duration(retryDelay)
+				retryDelay := time.Millisecond * time.Duration(cfg.HealthCheck.Active.RetryDelay)
 				select {
 				case <-time.After(retryDelay):
 					ctx := context.WithValue(r.Context(), RetryCount, retries+1)
@@ -83,7 +87,7 @@ func New(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm
 	(*alg).SetNodes(nodes)
 	lb.algorithm = alg
 
-	lb.StartPassiveHealthCheck(period)
+	lb.StartPassiveHealthCheck(cfg.HealthCheck.Passive.Period)
 
 	return lb
 }
