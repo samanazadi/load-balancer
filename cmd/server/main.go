@@ -40,18 +40,18 @@ func main() {
 		logging.Logger.Fatalf("invalid checker: %s", cfg.Checker.Name)
 	}
 
-	// strategy
-	var strategy algorithm.Strategy
-	switch cfg.Strategy.Name {
+	// algorithm
+	var alg algorithm.Algorithm
+	switch cfg.Algorithm.Name {
 	case algorithm.RR:
-		strategy = algorithm.NewRoundRobin()
-		logging.Logger.Println("strategy: round-robin")
+		alg = algorithm.NewRoundRobin()
+		logging.Logger.Println("algorithm: round-robin")
 	default:
-		logging.Logger.Fatalf("invalid strategy: %s", cfg.Strategy.Name)
+		logging.Logger.Fatalf("invalid algorithm: %s", cfg.Algorithm.Name)
 	}
 
 	// load balancer
-	lb := app.NewLoadBalancer(cfg.Nodes, chkr, strategy,
+	lb := app.NewLoadBalancer(cfg.Nodes, chkr, alg,
 		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
 	logging.Logger.Println("load balancer created")
 

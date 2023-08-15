@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	configPath   = "/etc/load-balancer/config.json"
-	strategyPath = "/etc/load-balancer/strategy.json"
-	checkerPath  = "/etc/load-balancer/checker.json"
+	configPath    = "/etc/load-balancer/config.json"
+	algorithmPath = "/etc/load-balancer/algorithm.json"
+	checkerPath   = "/etc/load-balancer/checker.json"
 )
 
 type ActiveHealthCheck struct {
@@ -27,7 +27,7 @@ type HealthCheck struct {
 	Passive PassiveHealthCheck `json:"passive"`
 }
 
-type Strategy struct {
+type Algorithm struct {
 	Name   string         `json:"name"`
 	Params map[string]any `json:"-,"`
 }
@@ -41,7 +41,7 @@ type Config struct {
 	Port        int         `json:"port"`
 	Nodes       []string    `json:"nodes"`
 	HealthCheck HealthCheck `json:"healthCheck"`
-	Strategy    Strategy    `json:"strategy"`
+	Algorithm   Algorithm   `json:"algorithm"`
 	Checker     Checker     `json:"checker"`
 }
 
@@ -58,12 +58,12 @@ func New() (*Config, error) {
 		return nil, fmt.Errorf("cannot unmarshal config file: %s", err.Error())
 	}
 
-	// read strategy.json file
-	params, err := readConfigFile(strategyPath, "strategy")
+	// read algorithm.json file
+	params, err := readConfigFile(algorithmPath, "algorithm")
 	if err != nil {
 		return nil, err
 	}
-	config.Strategy.Params = params
+	config.Algorithm.Params = params
 
 	// read checker.json file
 	params, err = readConfigFile(checkerPath, "checker")
@@ -76,14 +76,14 @@ func New() (*Config, error) {
 }
 
 func readConfigFile(path string, configType string) (map[string]any, error) {
-	var strategyParams map[string]any
-	strategyBytes, err := os.ReadFile(path)
+	var algorithmParams map[string]any
+	algorithmBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read %s file: %s", configType, err.Error())
 	}
-	err = json.Unmarshal(strategyBytes, &strategyParams)
+	err = json.Unmarshal(algorithmBytes, &algorithmParams)
 	if err != nil {
 		return nil, fmt.Errorf("cannot unmarshal %s file: %s", configType, err.Error())
 	}
-	return strategyParams, nil
+	return algorithmParams, nil
 }

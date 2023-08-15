@@ -9,8 +9,8 @@ const (
 	RR = "rr"
 )
 
-// Strategy is a balancing strategy like round-robin and consistent hashing
-type Strategy interface {
+// Algorithm is a balancing algorithm like round-robin and consistent hashing
+type Algorithm interface {
 	GetNextEligibleNode(*http.Request) *node.Node // based on alive, argument and implementation logic (RR, ...)
 	SetNodes([]*node.Node)
 }

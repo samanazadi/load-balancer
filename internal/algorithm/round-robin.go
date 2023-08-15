@@ -42,7 +42,7 @@ func (rr *RoundRobin) SetNodes(nodes []*node.Node) {
 	rr.Nodes = nodes
 }
 
-func NewRoundRobin() Strategy {
+func NewRoundRobin() Algorithm {
 	return &RoundRobin{
 		lastUsedIndex: -1,
 	}
