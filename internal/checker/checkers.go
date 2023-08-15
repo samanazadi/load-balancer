@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	TCP  = "tcp"
-	HTTP = "http"
+	TCPType  = "tcp"
+	HTTPType = "http"
 )
 
 // ConnectionChecker checks for establishment of a connection
@@ -20,12 +20,12 @@ type ConnectionChecker interface {
 	Check(*url.URL) bool
 }
 
-// TCPChecker checks by establishing a tcp connection.
-type TCPChecker struct {
+// TCP checks by establishing a tcp connection.
+type TCP struct {
 	Timeout int
 }
 
-func (c TCPChecker) Check(url *url.URL) bool {
+func (c TCP) Check(url *url.URL) bool {
 	timeout := time.Second * time.Duration(c.Timeout)
 	conn, err := net.DialTimeout("tcp", url.Host, timeout)
 	defer func() {
@@ -39,14 +39,14 @@ func (c TCPChecker) Check(url *url.URL) bool {
 	return err == nil
 }
 
-// HTTPChecker checks by making a get HTTP request
-type HTTPChecker struct {
+// HTTP checks by making a get HTTP request
+type HTTP struct {
 	Path      string
 	KeyPhrase string
 	Timeout   int
 }
 
-func (c HTTPChecker) Check(url *url.URL) bool {
+func (c HTTP) Check(url *url.URL) bool {
 	client := http.Client{
 		Timeout: time.Second * time.Duration(c.Timeout),
 	}

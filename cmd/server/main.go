@@ -23,14 +23,14 @@ func main() {
 	// checker
 	var chk checker.ConnectionChecker
 	switch cfg.Checker.Name {
-	case checker.TCP:
-		chk = checker.TCPChecker{
+	case checker.TCPType:
+		chk = checker.TCP{
 			Timeout: cfg.HealthCheck.Passive.Timeout,
 		}
 		logging.Logger.Println("checker: TCP checker")
-	case checker.HTTP:
+	case checker.HTTPType:
 		path, keyPhrase := checker.HTTPCheckerParamDecode(cfg.Checker.Params)
-		chk = checker.HTTPChecker{
+		chk = checker.HTTP{
 			Path:      path,
 			KeyPhrase: keyPhrase,
 			Timeout:   cfg.HealthCheck.Passive.Timeout,
