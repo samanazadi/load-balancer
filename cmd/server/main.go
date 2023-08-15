@@ -21,23 +21,10 @@ func main() {
 	}
 
 	// checker
-	var chk checker.ConnectionChecker
-	switch cfg.Checker.Name {
-	case checker.TCPType:
-		chk = checker.TCP{
-			Timeout: cfg.HealthCheck.Passive.Timeout,
-		}
-		logging.Logger.Println("checker: TCP checker")
-	case checker.HTTPType:
-		path, keyPhrase := checker.HTTPCheckerParamDecode(cfg.Checker.Params)
-		chk = checker.HTTP{
-			Path:      path,
-			KeyPhrase: keyPhrase,
-			Timeout:   cfg.HealthCheck.Passive.Timeout,
-		}
-		logging.Logger.Println("checker: HTTP checker")
-	default:
-		logging.Logger.Fatalf("invalid checker: %s", cfg.Checker.Name)
+	logging.Logger.Printf("checker: %s", cfg.Checker.Name)
+	chk, err := checker.New(cfg)
+	if err != nil {
+		logging.Logger.Fatal(err)
 	}
 
 	// algorithm

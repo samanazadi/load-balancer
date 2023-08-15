@@ -1,6 +1,8 @@
 package checker
 
 import (
+	"fmt"
+	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/pkg/logging"
 	"io"
 	"net"
@@ -18,6 +20,28 @@ const (
 // ConnectionChecker checks for establishment of a connection
 type ConnectionChecker interface {
 	Check(*url.URL) bool
+}
+
+func New(cfg *configs.Config) (*ConnectionChecker, error) {
+	var chk ConnectionChecker
+	switch cfg.Checker.Name {
+	case TCPType:
+		chk = TCP{
+			Timeout: cfg.HealthCheck.Passive.Timeout,
+		}
+		return &chk, nil
+
+	case HTTPType:
+		path, keyPhrase := HTTPCheckerParamDecode(cfg.Checker.Params)
+		chk = HTTP{
+			Path:      path,
+			KeyPhrase: keyPhrase,
+			Timeout:   cfg.HealthCheck.Passive.Timeout,
+		}
+		return &chk, nil
+	default:
+		return nil, fmt.Errorf("invalid checker: %s", cfg.Checker.Name)
+	}
 }
 
 // TCP checks by establishing a tcp connection.

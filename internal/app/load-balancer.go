@@ -35,7 +35,7 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker, alg *algorithm.Algorithm,
+func NewLoadBalancer(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm.Algorithm,
 	maxRetry int, retryDelay int, period int) *LoadBalancer {
 	lb := &LoadBalancer{}
 
@@ -79,7 +79,7 @@ func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker,
 		logging.Logger.Printf("node added: %s", nodeURLString)
 	}
 
-	lb.serverPool = newServerPool(nodes, checker)
+	lb.serverPool = newServerPool(nodes, chk)
 	(*alg).SetNodes(nodes)
 	lb.algorithm = alg
 
