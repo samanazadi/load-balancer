@@ -1,4 +1,4 @@
-package app
+package checker
 
 import (
 	"github.com/samanazadi/load-balancer/pkg/logging"

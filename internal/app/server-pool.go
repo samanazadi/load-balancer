@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/samanazadi/load-balancer/internal/checker"
+	"github.com/samanazadi/load-balancer/internal/models/node"
 	"github.com/samanazadi/load-balancer/pkg/logging"
 	"net/url"
 	"sync"
@@ -9,8 +11,8 @@ import (
 
 // ServerPool manage servers
 type ServerPool struct {
-	nodes             []*Node
-	ConnectionChecker ConnectionChecker
+	nodes             []*node.Node
+	ConnectionChecker checker.ConnectionChecker
 }
 
 func (p *ServerPool) passiveHealthCheck() {
@@ -65,7 +67,7 @@ func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
 	}
 }
 
-func newServerPool(nodes []*Node, checker ConnectionChecker) ServerPool {
+func newServerPool(nodes []*node.Node, checker checker.ConnectionChecker) ServerPool {
 	return ServerPool{
 		nodes:             nodes,
 		ConnectionChecker: checker,

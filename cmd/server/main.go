@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/samanazadi/load-balancer/configs"
+	"github.com/samanazadi/load-balancer/internal/algorithm"
 	"github.com/samanazadi/load-balancer/internal/app"
+	"github.com/samanazadi/load-balancer/internal/checker"
 	"github.com/samanazadi/load-balancer/pkg/logging"
 	"net/http"
 	"strconv"
@@ -19,16 +21,16 @@ func main() {
 	}
 
 	// checker
-	var checker app.ConnectionChecker
+	var chkr checker.ConnectionChecker
 	switch cfg.Checker.Name {
-	case app.TCP:
-		checker = app.TCPChecker{
+	case checker.TCP:
+		chkr = checker.TCPChecker{
 			Timeout: cfg.HealthCheck.Passive.Timeout,
 		}
 		logging.Logger.Println("checker: TCP checker")
-	case app.HTTP:
-		path, keyPhrase := app.HTTPCheckerParamDecode(cfg.Checker.Params)
-		checker = app.HTTPChecker{
+	case checker.HTTP:
+		path, keyPhrase := checker.HTTPCheckerParamDecode(cfg.Checker.Params)
+		chkr = checker.HTTPChecker{
 			Path:      path,
 			KeyPhrase: keyPhrase,
 			Timeout:   cfg.HealthCheck.Passive.Timeout,
@@ -39,17 +41,17 @@ func main() {
 	}
 
 	// strategy
-	var strategy app.Strategy
+	var strategy algorithm.Strategy
 	switch cfg.Strategy.Name {
-	case app.RR:
-		strategy = app.NewRoundRobin()
+	case algorithm.RR:
+		strategy = algorithm.NewRoundRobin()
 		logging.Logger.Println("strategy: round-robin")
 	default:
 		logging.Logger.Fatalf("invalid strategy: %s", cfg.Strategy.Name)
 	}
 
 	// load balancer
-	lb := app.NewLoadBalancer(cfg.Nodes, checker, strategy,
+	lb := app.NewLoadBalancer(cfg.Nodes, chkr, strategy,
 		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
 	logging.Logger.Println("load balancer created")
 

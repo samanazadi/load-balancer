@@ -1,6 +1,7 @@
-package app
+package algorithm
 
 import (
+	"github.com/samanazadi/load-balancer/internal/models/node"
 	"net/http"
 	"sync"
 )
@@ -8,7 +9,7 @@ import (
 type RoundRobin struct {
 	lastUsedIndex int
 	mux           sync.RWMutex // for protecting lastUsedIndex from multiple access
-	Nodes         []*Node
+	Nodes         []*node.Node
 }
 
 func (rr *RoundRobin) nextIndex() int {
@@ -19,7 +20,7 @@ func (rr *RoundRobin) nextIndex() int {
 	return rr.lastUsedIndex
 }
 
-func (rr *RoundRobin) GetNextEligibleNode(*http.Request) *Node {
+func (rr *RoundRobin) GetNextEligibleNode(*http.Request) *node.Node {
 	next := rr.nextIndex()
 	last := next + len(rr.Nodes)
 	for i := next; i < last; i++ {
@@ -37,7 +38,7 @@ func (rr *RoundRobin) GetNextEligibleNode(*http.Request) *Node {
 	return nil // no available node
 }
 
-func (rr *RoundRobin) SetNodes(nodes []*Node) {
+func (rr *RoundRobin) SetNodes(nodes []*node.Node) {
 	rr.Nodes = nodes
 }
 
