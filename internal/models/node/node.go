@@ -10,7 +10,7 @@ import (
 type Node struct {
 	URL          *url.URL
 	alive        bool
-	ReverseProxy httputil.ReverseProxy
+	ReverseProxy *httputil.ReverseProxy
 	mux          sync.RWMutex // for protecting alive
 }
 
@@ -24,4 +24,13 @@ func (n *Node) IsAlive() bool {
 	n.mux.RLock()
 	defer n.mux.RUnlock()
 	return n.alive
+}
+
+func New(url *url.URL, rp *httputil.ReverseProxy, alive bool) *Node {
+	n := &Node{
+		URL:          url,
+		ReverseProxy: rp,
+	}
+	n.SetAlive(alive)
+	return n
 }

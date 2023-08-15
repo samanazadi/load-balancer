@@ -70,12 +70,7 @@ func New(cfg *configs.Config, chk *checker.ConnectionChecker, alg *algorithm.Alg
 			lb.ServeHTTP(rw, r.WithContext(newCtx))
 		}
 
-		n := node.Node{
-			URL:          nodeURL,
-			ReverseProxy: *rp,
-		}
-		n.SetAlive(true)
-		nodes = append(nodes, &n)
+		nodes = append(nodes, node.New(nodeURL, rp, true))
 		logging.Logger.Printf("node added: %s", nodeURLString)
 	}
 
