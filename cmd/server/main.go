@@ -41,13 +41,10 @@ func main() {
 	}
 
 	// algorithm
-	var alg algorithm.Algorithm
-	switch cfg.Algorithm.Name {
-	case algorithm.RR:
-		alg = algorithm.NewRoundRobin()
-		logging.Logger.Println("algorithm: round-robin")
-	default:
-		logging.Logger.Fatalf("invalid algorithm: %s", cfg.Algorithm.Name)
+	logging.Logger.Printf("algorithm: %s", cfg.Algorithm.Name)
+	alg, err := algorithm.New(cfg)
+	if err != nil {
+		logging.Logger.Fatal(err)
 	}
 
 	// load balancer

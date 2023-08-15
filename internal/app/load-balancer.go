@@ -17,12 +17,12 @@ const RetryCount = iota
 // LoadBalancer is a server pool along an algorithm
 type LoadBalancer struct {
 	serverPool ServerPool
-	algorithm  algorithm.Algorithm
+	algorithm  *algorithm.Algorithm
 }
 
 // ServeHTTP route request based on algorithm
 func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	if n := lb.algorithm.GetNextEligibleNode(r); n != nil {
+	if n := (*lb.algorithm).GetNextEligibleNode(r); n != nil {
 		n.ReverseProxy.ServeHTTP(rw, r)
 		return
 	}
@@ -35,7 +35,7 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker, algorithm algorithm.Algorithm,
+func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker, alg *algorithm.Algorithm,
 	maxRetry int, retryDelay int, period int) *LoadBalancer {
 	lb := &LoadBalancer{}
 
@@ -80,8 +80,8 @@ func NewLoadBalancer(nodeURLStrings []string, checker checker.ConnectionChecker,
 	}
 
 	lb.serverPool = newServerPool(nodes, checker)
-	algorithm.SetNodes(nodes)
-	lb.algorithm = algorithm
+	(*alg).SetNodes(nodes)
+	lb.algorithm = alg
 
 	lb.StartPassiveHealthCheck(period)
 
