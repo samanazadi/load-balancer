@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// load balancer
-	lb := app.NewLoadBalancer(cfg.Nodes, chk, alg,
+	lb := app.New(cfg.Nodes, chk, alg,
 		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
 	logging.Logger.Println("load balancer created")
 

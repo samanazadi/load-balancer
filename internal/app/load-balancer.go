@@ -35,7 +35,7 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 	lb.serverPool.startPassiveHealthCheck(period)
 }
 
-func NewLoadBalancer(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm.Algorithm,
+func New(nodeURLStrings []string, chk *checker.ConnectionChecker, alg *algorithm.Algorithm,
 	maxRetry int, retryDelay int, period int) *LoadBalancer {
 	lb := &LoadBalancer{}
 
