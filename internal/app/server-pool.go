@@ -24,22 +24,20 @@ func (p *ServerPool) passiveHealthCheck() {
 			defer wg.Done()
 			alive := (*p.ConnectionChecker).Check(n.URL)
 			if alive != n.IsAlive() {
-				prev := "down"
-				if n.IsAlive() {
-					prev = "up"
-				}
-
-				now := "down"
-				if alive {
-					now = "up"
-				}
-
-				logging.Logger.Printf("passive health check, %s: %s -> %s", n.URL.String(), prev, now)
+				logging.Logger.Printf("passive health check, %s: %s -> %s",
+					n.URL.String(), Alive(n.IsAlive()), Alive(alive))
 			}
 			n.SetAlive(alive)
 		}()
 	}
 	wg.Wait()
+}
+
+func Alive(alive bool) string {
+	if alive {
+		return "up"
+	}
+	return "down"
 }
 
 func (p *ServerPool) startPassiveHealthCheck(period int) {
