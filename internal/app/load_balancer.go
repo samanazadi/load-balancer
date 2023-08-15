@@ -12,17 +12,17 @@ import (
 
 // LoadBalancer is a server pool along an algorithm
 type LoadBalancer struct {
-	serverPool ServerPool
-	algorithm  algorithm.Algorithm
+	ServerPool ServerPool
+	Algorithm  algorithm.Algorithm
 }
 
 func (lb *LoadBalancer) SetNodeAlive(url *url.URL, alive bool) {
-	lb.serverPool.setNodeAlive(url, alive)
+	lb.ServerPool.SetNodeAlive(url, alive)
 }
 
 // ServeHTTP route request based on algorithm
 func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	if n := lb.algorithm.GetNextEligibleNode(r); n != nil {
+	if n := lb.Algorithm.GetNextEligibleNode(r); n != nil {
 		n.ReverseProxy.ServeHTTP(rw, r)
 		return
 	}
@@ -32,7 +32,7 @@ func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 // StartPassiveHealthCheck starts passive health check daemon
 func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
-	lb.serverPool.startPassiveHealthCheck(period)
+	lb.ServerPool.StartPassiveHealthCheck(period)
 }
 
 func New(cfg *configs.Config, chk checker.ConnectionChecker, alg algorithm.Algorithm) *LoadBalancer {
@@ -49,9 +49,9 @@ func New(cfg *configs.Config, chk checker.ConnectionChecker, alg algorithm.Algor
 		logging.Logger.Printf("node added: %s", nodeURLString)
 	}
 
-	lb.serverPool = newServerPool(nodes, chk)
+	lb.ServerPool = NewServerPool(nodes, chk)
 	alg.SetNodes(nodes)
-	lb.algorithm = alg
+	lb.Algorithm = alg
 
 	lb.StartPassiveHealthCheck(cfg.HealthCheck.Passive.Period)
 

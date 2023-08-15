@@ -11,13 +11,13 @@ import (
 
 // ServerPool manage servers
 type ServerPool struct {
-	nodes             []*node.Node
+	Nodes             []*node.Node
 	ConnectionChecker checker.ConnectionChecker
 }
 
 func (p *ServerPool) passiveHealthCheck() {
 	var wg sync.WaitGroup
-	for _, n := range p.nodes {
+	for _, n := range p.Nodes {
 		wg.Add(1)
 		n := n
 		go func() {
@@ -25,7 +25,7 @@ func (p *ServerPool) passiveHealthCheck() {
 			alive := p.ConnectionChecker.Check(n.URL)
 			if alive != n.IsAlive() {
 				logging.Logger.Printf("passive health check, %s: %s -> %s",
-					n.URL.String(), Alive(n.IsAlive()), Alive(alive))
+					n.URL.String(), aliveToString(n.IsAlive()), aliveToString(alive))
 			}
 			n.SetAlive(alive)
 		}()
@@ -33,14 +33,14 @@ func (p *ServerPool) passiveHealthCheck() {
 	wg.Wait()
 }
 
-func Alive(alive bool) string {
+func aliveToString(alive bool) string {
 	if alive {
 		return "up"
 	}
 	return "down"
 }
 
-func (p *ServerPool) startPassiveHealthCheck(period int) {
+func (p *ServerPool) StartPassiveHealthCheck(period int) {
 	go func() {
 		logging.Logger.Printf("passive health check daemon started")
 		period := time.Second * time.Duration(period)
@@ -56,8 +56,8 @@ func (p *ServerPool) startPassiveHealthCheck(period int) {
 	}()
 }
 
-func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
-	for _, n := range p.nodes {
+func (p *ServerPool) SetNodeAlive(nodeURL *url.URL, alive bool) {
+	for _, n := range p.Nodes {
 		if n.URL.String() == nodeURL.String() {
 			n.SetAlive(alive)
 			return
@@ -65,9 +65,9 @@ func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
 	}
 }
 
-func newServerPool(nodes []*node.Node, chk checker.ConnectionChecker) ServerPool {
+func NewServerPool(nodes []*node.Node, chk checker.ConnectionChecker) ServerPool {
 	return ServerPool{
-		nodes:             nodes,
+		Nodes:             nodes,
 		ConnectionChecker: chk,
 	}
 }
