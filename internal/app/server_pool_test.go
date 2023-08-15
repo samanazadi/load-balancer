@@ -7,22 +7,16 @@ import (
 	"testing"
 )
 
-func AliveToString(alive bool) string {
-	if alive {
-		return "Alive"
-	}
-	return "Dead"
+type Test struct {
+	url   *url.URL
+	alive bool
+	setTo bool
+	want  bool
 }
 
-func TestSetNodeAlive(t *testing.T) {
+func createFakeNodes() ([]*node.Node, []*Test) {
 	// data preparation
-	type Test struct {
-		url   *url.URL
-		alive bool
-		setTo bool
-		want  bool
-	}
-	var tests []Test
+	var tests []*Test
 	urls := []string{
 		"http://localhost:8001",
 		"http://localhost:8002",
@@ -40,13 +34,25 @@ func TestSetNodeAlive(t *testing.T) {
 		}
 		nodes = append(nodes, &n)
 
-		tests = append(tests, Test{
+		tests = append(tests, &Test{
 			url:   uu,
 			alive: alives[i],
 			setTo: setTos[i],
 			want:  setTos[i],
 		})
 	}
+	return nodes, tests
+}
+
+func AliveToString(alive bool) string {
+	if alive {
+		return "Alive"
+	}
+	return "Dead"
+}
+
+func TestSPSetNodeAlive(t *testing.T) {
+	nodes, tests := createFakeNodes()
 	pool := ServerPool{
 		nodes: nodes,
 	}
