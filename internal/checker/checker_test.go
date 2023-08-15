@@ -34,7 +34,7 @@ func TestNew(t *testing.T) {
 	cfg = &configs.Config{Checker: configs.Checker{Name: "invalid"}}
 	chk, err = New(cfg)
 	if err == nil {
-		t.Errorf("checker.New(HTTPType) doesn't return error")
+		t.Errorf("checker.New(invalid type) doesn't return error")
 	}
 }
 
