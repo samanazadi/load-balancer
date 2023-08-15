@@ -21,16 +21,16 @@ func main() {
 	}
 
 	// checker
-	var chkr checker.ConnectionChecker
+	var chk checker.ConnectionChecker
 	switch cfg.Checker.Name {
 	case checker.TCP:
-		chkr = checker.TCPChecker{
+		chk = checker.TCPChecker{
 			Timeout: cfg.HealthCheck.Passive.Timeout,
 		}
 		logging.Logger.Println("checker: TCP checker")
 	case checker.HTTP:
 		path, keyPhrase := checker.HTTPCheckerParamDecode(cfg.Checker.Params)
-		chkr = checker.HTTPChecker{
+		chk = checker.HTTPChecker{
 			Path:      path,
 			KeyPhrase: keyPhrase,
 			Timeout:   cfg.HealthCheck.Passive.Timeout,
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// load balancer
-	lb := app.NewLoadBalancer(cfg.Nodes, chkr, alg,
+	lb := app.NewLoadBalancer(cfg.Nodes, chk, alg,
 		cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period)
 	logging.Logger.Println("load balancer created")
 
