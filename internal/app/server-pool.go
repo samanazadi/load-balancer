@@ -12,7 +12,7 @@ import (
 // ServerPool manage servers
 type ServerPool struct {
 	nodes             []*node.Node
-	ConnectionChecker *checker.ConnectionChecker
+	ConnectionChecker checker.ConnectionChecker
 }
 
 func (p *ServerPool) passiveHealthCheck() {
@@ -22,7 +22,7 @@ func (p *ServerPool) passiveHealthCheck() {
 		n := n
 		go func() {
 			defer wg.Done()
-			alive := (*p.ConnectionChecker).Check(n.URL)
+			alive := p.ConnectionChecker.Check(n.URL)
 			if alive != n.IsAlive() {
 				logging.Logger.Printf("passive health check, %s: %s -> %s",
 					n.URL.String(), Alive(n.IsAlive()), Alive(alive))
@@ -65,7 +65,7 @@ func (p *ServerPool) setNodeAlive(nodeURL *url.URL, alive bool) {
 	}
 }
 
-func newServerPool(nodes []*node.Node, chk *checker.ConnectionChecker) ServerPool {
+func newServerPool(nodes []*node.Node, chk checker.ConnectionChecker) ServerPool {
 	return ServerPool{
 		nodes:             nodes,
 		ConnectionChecker: chk,

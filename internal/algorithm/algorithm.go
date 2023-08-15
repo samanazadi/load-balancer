@@ -17,11 +17,11 @@ type Algorithm interface {
 	SetNodes([]*node.Node)
 }
 
-func New(cfg *configs.Config) (*Algorithm, error) {
+func New(cfg *configs.Config) (Algorithm, error) {
 	switch cfg.Algorithm.Name {
 	case RRType:
 		rr := NewRoundRobin()
-		return &rr, nil
+		return rr, nil
 	default:
 		return nil, fmt.Errorf("invalid algorithm: %s", cfg.Algorithm.Name)
 	}
