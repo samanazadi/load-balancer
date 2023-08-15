@@ -7,14 +7,13 @@ import (
 	"testing"
 )
 
-func createNode(u string, alive bool) *Node {
-	uu, _ := url.Parse(u)
-	return New(uu, alive, nil, nil)
-}
-
 func TestSetAlive(t *testing.T) {
 	urlStr := "localhost:8001"
-	node := createNode(urlStr, false)
+	uu, _ := url.Parse(urlStr)
+	node := &Node{
+		URL:   uu,
+		alive: false,
+	}
 	node.SetAlive(true)
 
 	if !node.alive {
@@ -24,7 +23,10 @@ func TestSetAlive(t *testing.T) {
 		t.Error("Node.SetAlive(true) changed URL")
 	}
 
-	node = createNode(urlStr, true)
+	node = &Node{
+		URL:   uu,
+		alive: true,
+	}
 	node.SetAlive(false)
 
 	if node.alive {
@@ -37,7 +39,11 @@ func TestSetAlive(t *testing.T) {
 
 func TestIsAlive(t *testing.T) {
 	urlStr := "localhost:8001"
-	node := createNode(urlStr, false)
+	uu, _ := url.Parse(urlStr)
+	node := &Node{
+		URL:   uu,
+		alive: false,
+	}
 
 	if node.IsAlive() {
 		t.Error("Node.IsAlive() = true")
@@ -46,7 +52,10 @@ func TestIsAlive(t *testing.T) {
 		t.Error("Node.IsAlive() changed URL")
 	}
 
-	node = createNode(urlStr, true)
+	node = &Node{
+		URL:   uu,
+		alive: true,
+	}
 
 	if !node.IsAlive() {
 		t.Error("Node.IsAlive() = false")
@@ -58,7 +67,8 @@ func TestIsAlive(t *testing.T) {
 
 func TestNewAlive(t *testing.T) {
 	urlStr := "localhost:8001"
-	node := createNode(urlStr, true) // calls node.New
+	uu, _ := url.Parse(urlStr)
+	node := New(uu, true, nil, nil)
 
 	if !node.alive {
 		t.Error("node.New(*, true, *, *).alive = false")
@@ -70,7 +80,8 @@ func TestNewAlive(t *testing.T) {
 
 func TestNewDead(t *testing.T) {
 	urlStr := "localhost:8001"
-	node := createNode(urlStr, false) // calls node.New
+	uu, _ := url.Parse(urlStr)
+	node := New(uu, false, nil, nil)
 
 	if node.alive {
 		t.Error("node.New(*, false, *, *).alive = true")
