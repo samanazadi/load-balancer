@@ -37,13 +37,9 @@ func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
 }
 
 func New(cfg *configs.Config, chk *checker.ConnectionChecker, alg *algorithm.Algorithm) *LoadBalancer {
-
-	// cfg.HealthCheck.Active.MaxRetry, cfg.HealthCheck.Active.RetryDelay, cfg.HealthCheck.Passive.Period
-	// maxRetry int, retryDelay int, period int
-
 	lb := &LoadBalancer{}
-
 	nodes := make([]*node.Node, 0, len(cfg.Nodes))
+
 	for _, nodeURLString := range cfg.Nodes {
 		nodeURL, err := url.Parse(nodeURLString)
 		if err != nil {
