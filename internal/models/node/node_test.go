@@ -2,38 +2,26 @@ package node
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
 )
 
 func TestSetAlive(t *testing.T) {
-	urlStr := "localhost:8001"
-	uu, _ := url.Parse(urlStr)
-	node := &Node{
-		URL:   uu,
-		alive: false,
-	}
-	node.SetAlive(true)
+	_, tests := CreateFakeNodes()
 
-	if !node.alive {
-		t.Error("Node.SetAlive(true)")
-	}
-	if node.URL.String() != urlStr {
-		t.Error("Node.SetAlive(true) changed URL")
-	}
-
-	node = &Node{
-		URL:   uu,
-		alive: true,
-	}
-	node.SetAlive(false)
-
-	if node.alive {
-		t.Error("Node.SetAlive(false)")
-	}
-	if node.URL.String() != urlStr {
-		t.Error("Node.SetAlive(false) changed URL")
+	for _, test := range tests {
+		name := fmt.Sprintf("%sTo%s", AliveToString(test.Alive), AliveToString(test.SetTo))
+		t.Run(name, func(t *testing.T) {
+			test.Node.SetAlive(test.SetTo)
+			if test.Node.alive != test.Want {
+				t.Error("Node.IsAlive() = true")
+			}
+			if test.Node.URL.String() != test.URL.String() {
+				t.Error("Node.IsAlive() changed URL")
+			}
+		})
 	}
 }
 

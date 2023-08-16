@@ -79,3 +79,50 @@ func getRetryCountFromContext(r *http.Request) int {
 	}
 	return 1
 }
+
+type TestCase struct {
+	URL   *url.URL
+	Alive bool
+	SetTo bool
+	Want  bool
+	Node  *Node
+}
+
+// CreateFakeNodes create some teste cases
+func CreateFakeNodes() ([]*Node, []*TestCase) {
+	var tests []*TestCase
+	urls := []string{
+		"http://localhost:8001",
+		"http://localhost:8002",
+		"http://localhost:8003",
+		"http://localhost:8004",
+	}
+	alives := []bool{true, true, false, false}
+	setTos := []bool{true, false, true, false}
+
+	var nodes []*Node
+	for i := range urls {
+		uu, _ := url.Parse(urls[i])
+		n := Node{
+			URL: uu,
+		}
+		nodes = append(nodes, &n)
+
+		tests = append(tests, &TestCase{
+			URL:   uu,
+			Alive: alives[i],
+			SetTo: setTos[i],
+			Want:  setTos[i],
+			Node:  &n,
+		})
+	}
+	return nodes, tests
+}
+
+// AliveToString return string represetation of an alive field
+func AliveToString(alive bool) string {
+	if alive {
+		return "Alive"
+	}
+	return "Dead"
+}
