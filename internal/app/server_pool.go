@@ -40,7 +40,7 @@ func aliveToString(alive bool) string {
 	return "down"
 }
 
-func (p *ServerPool) StartPassiveHealthCheck(period int) {
+func (p *ServerPool) StartPassiveHealthCheck(period int, stop <-chan bool, done chan<- bool) {
 	go func() {
 		logging.Logger.Printf("passive health check daemon started")
 		period := time.Second * time.Duration(period)
@@ -51,6 +51,9 @@ func (p *ServerPool) StartPassiveHealthCheck(period int) {
 				logging.Logger.Println("passive health check is starting...")
 				p.passiveHealthCheck()
 				logging.Logger.Println("passive health check completed")
+			case <-stop:
+				done <- true
+				return
 			}
 		}
 	}()

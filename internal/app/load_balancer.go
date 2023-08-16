@@ -31,11 +31,12 @@ func (lb *LoadBalancer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 // StartPassiveHealthCheck starts passive health check daemon
-func (lb *LoadBalancer) StartPassiveHealthCheck(period int) {
-	lb.ServerPool.StartPassiveHealthCheck(period)
+func (lb *LoadBalancer) StartPassiveHealthCheck(period int, stop <-chan bool, done chan<- bool) {
+	lb.ServerPool.StartPassiveHealthCheck(period, stop, done)
 }
 
-func New(cfg *configs.Config, chk checker.ConnectionChecker, alg algorithm.Algorithm) *LoadBalancer {
+func New(cfg *configs.Config, chk checker.ConnectionChecker, alg algorithm.Algorithm,
+	stop <-chan bool, done chan<- bool) *LoadBalancer {
 	lb := &LoadBalancer{}
 	nodes := make([]*node.Node, 0, len(cfg.Nodes))
 
@@ -53,7 +54,7 @@ func New(cfg *configs.Config, chk checker.ConnectionChecker, alg algorithm.Algor
 	alg.SetNodes(nodes)
 	lb.Algorithm = alg
 
-	lb.StartPassiveHealthCheck(cfg.HealthCheck.Passive.Period)
+	lb.StartPassiveHealthCheck(cfg.HealthCheck.Passive.Period, stop, done)
 
 	return lb
 }
