@@ -97,7 +97,7 @@ func TestBigBang(t *testing.T) {
 	}
 
 	// load balancer
-	lb := app.New(cfg, chk, alg)
+	lb := app.New(cfg, chk, alg, nil, nil)
 	t.Log("load balancer created")
 
 	server := &http.Server{
@@ -142,8 +142,8 @@ func TestBigBang(t *testing.T) {
 	}
 
 	lb.ServerPool.ConnectionChecker = chk
-	mocks[1].Close()              // shut down node 1
-	lb.StartPassiveHealthCheck(1) // run health check to mark node 1 as dead
+	mocks[1].Close()                        // shut down node 1
+	lb.StartPassiveHealthCheck(1, nil, nil) // run health check to mark node 1 as dead
 	time.Sleep(2 * time.Second)
 
 	found := false
@@ -172,8 +172,8 @@ func TestBigBang(t *testing.T) {
 	}
 
 	lb.ServerPool.ConnectionChecker = chk
-	mocks[2].Close()              // shut down node 2
-	lb.StartPassiveHealthCheck(1) // run health check to mark node 2 as dead
+	mocks[2].Close()                        // shut down node 2
+	lb.StartPassiveHealthCheck(1, nil, nil) // run health check to mark node 2 as dead
 	time.Sleep(2 * time.Second)
 
 	found = false
