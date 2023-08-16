@@ -70,7 +70,8 @@ func TestBigBang(t *testing.T) {
 	}
 
 	// config
-	cfg, err := configs.New()
+	cfgPath := "/etc/load-balancer" // the path is not important. configs will be changed as needed.
+	cfg, err := configs.New(cfgPath)
 	if err != nil {
 		t.Fatal(err)
 	}
