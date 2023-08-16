@@ -55,7 +55,7 @@ func (t *TestingLogger) Panicln(v ...any) {
 	t.t.Fatal(v...)
 }
 
-const N = 4
+const N = 4 // number of nodes
 
 func TestBigBang(t *testing.T) {
 	t.Log("integration test started")
@@ -135,12 +135,24 @@ func TestBigBang(t *testing.T) {
 	// passive health check: tcp
 	cfg.Checker.Name = checker.TCPType
 	cfg.HealthCheck.Passive.Timeout = 3
-	err, alive, found := forcePassiveCheckDeadNode(cfg, lb, mocks[1])
+	chk, err = checker.New(cfg)
 	if err != nil {
 		t.Fatalf("cannot create checker: %s", err)
 	}
-	if alive {
-		t.Fatalf("passive health didn't recognized dead node")
+
+	lb.ServerPool.ConnectionChecker = chk
+	mocks[1].Close()              // shut down node 1
+	lb.StartPassiveHealthCheck(1) // run health check to mark node 1 as dead
+	time.Sleep(2 * time.Second)
+
+	found := false
+	for _, n := range lb.ServerPool.Nodes {
+		if n.URL.String() == mocks[1].URL {
+			found = true
+			if n.IsAlive() {
+				t.Fatalf("passive health check didn't mark node as  dead")
+			}
+		}
 	}
 	if !found {
 		t.Fatalf("dead node not found in server pool")
@@ -153,12 +165,24 @@ func TestBigBang(t *testing.T) {
 		"path":      "/ping",
 		"keyPhrase": "pong",
 	}
-	err, alive, found = forcePassiveCheckDeadNode(cfg, lb, mocks[2])
+	chk, err = checker.New(cfg)
 	if err != nil {
 		t.Fatalf("cannot create checker: %s", err)
 	}
-	if alive {
-		t.Fatalf("passive health didn't recognized dead node")
+
+	lb.ServerPool.ConnectionChecker = chk
+	mocks[2].Close()              // shut down node 2
+	lb.StartPassiveHealthCheck(1) // run health check to mark node 2 as dead
+	time.Sleep(2 * time.Second)
+
+	found = false
+	for _, n := range lb.ServerPool.Nodes {
+		if n.URL.String() == mocks[2].URL {
+			found = true
+			if n.IsAlive() {
+				t.Fatalf("passive health check didn't mark node as  dead")
+			}
+		}
 	}
 	if !found {
 		t.Fatalf("dead node not found in server pool")
@@ -169,38 +193,6 @@ func TestBigBang(t *testing.T) {
 		mock.Close()
 	}
 	t.Log("integration test completed")
-}
-
-func forcePassiveCheckDeadNode(cfg *configs.Config, lb *app.LoadBalancer, mock *httptest.Server) (err error, alive, found bool) {
-	chk, err := checker.New(cfg)
-	if err != nil {
-		return
-	}
-
-	lb.ServerPool.ConnectionChecker = chk
-	mock.Close()
-	lb.StartPassiveHealthCheck(1)
-	time.Sleep(2 * time.Second)
-
-	for _, n := range lb.ServerPool.Nodes {
-		if n.URL.String() == mock.URL {
-			if n.IsAlive() {
-				err = nil
-				alive = true
-				found = true
-				return
-			} else {
-				err = nil
-				alive = false
-				found = true
-				return
-			}
-		}
-	}
-	err = nil
-	alive = false
-	found = false
-	return
 }
 
 func CreateTestServer(n int) *httptest.Server {
