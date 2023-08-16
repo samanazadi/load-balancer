@@ -54,14 +54,14 @@ func AliveToString(alive bool) string {
 func TestSPSetNodeAlive(t *testing.T) {
 	nodes, tests := createFakeNodes()
 	pool := ServerPool{
-		nodes: nodes,
+		Nodes: nodes,
 	}
 
 	for _, test := range tests {
 		name := fmt.Sprintf("%sTo%s", AliveToString(test.alive), AliveToString(test.setTo))
 		t.Run(name, func(t *testing.T) {
-			pool.setNodeAlive(test.url, test.setTo)
-			for _, n := range pool.nodes { // search for corresponding node
+			pool.SetNodeAlive(test.url, test.setTo)
+			for _, n := range pool.Nodes { // search for corresponding node
 				if n.URL.String() == test.url.String() {
 					// node found
 					if n.IsAlive() != test.want {
@@ -90,13 +90,13 @@ func TestNewServerPool(t *testing.T) {
 		}
 		nodes = append(nodes, &n)
 	}
-	pool := ServerPool{nodes: nodes}
+	pool := ServerPool{Nodes: nodes}
 
-	if len(pool.nodes) != len(urls) {
-		t.Errorf("ServerPool.newServerPool(%d nodes) caused %d nodes", len(urls), len(pool.nodes))
+	if len(pool.Nodes) != len(urls) {
+		t.Errorf("ServerPool.newServerPool(%d nodes) caused %d nodes", len(urls), len(pool.Nodes))
 	}
 	for i, u := range urls {
-		if pool.nodes[i].URL.String() != u {
+		if pool.Nodes[i].URL.String() != u {
 			t.Errorf("ServerPool.newServerPool(node.Node{URL: %s}) not added", u)
 		}
 	}
