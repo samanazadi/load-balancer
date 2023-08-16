@@ -23,27 +23,20 @@ type ConnectionChecker interface {
 }
 
 func New(cfg *configs.Config) (ConnectionChecker, error) {
-	var chk ConnectionChecker
 	switch cfg.Checker.Name {
 	case TCPType:
-		chk = TCP{
-			Timeout: cfg.HealthCheck.Passive.Timeout,
-		}
-		return chk, nil
+		return NewTCP(cfg), nil
 
 	case HTTPType:
-		path, keyPhrase, err := HTTPCheckerParamDecode(cfg.Checker.Params)
-		if err != nil {
-			return nil, err
-		}
-		chk = HTTP{
-			Path:      path,
-			KeyPhrase: keyPhrase,
-			Timeout:   cfg.HealthCheck.Passive.Timeout,
-		}
-		return chk, nil
+		return NewHTTP(cfg)
 	default:
 		return nil, fmt.Errorf("invalid checker: %s", cfg.Checker.Name)
+	}
+}
+
+func NewTCP(cfg *configs.Config) ConnectionChecker {
+	return TCP{
+		Timeout: cfg.HealthCheck.Passive.Timeout,
 	}
 }
 
@@ -71,6 +64,18 @@ type HTTP struct {
 	Path      string
 	KeyPhrase string
 	Timeout   int
+}
+
+func NewHTTP(cfg *configs.Config) (ConnectionChecker, error) {
+	path, keyPhrase, err := HTTPCheckerParamDecode(cfg.Checker.Params)
+	if err != nil {
+		return nil, err
+	}
+	return HTTP{
+		Path:      path,
+		KeyPhrase: keyPhrase,
+		Timeout:   cfg.HealthCheck.Passive.Timeout,
+	}, nil
 }
 
 func (c HTTP) Check(url *url.URL) bool {
