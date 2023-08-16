@@ -23,6 +23,7 @@ func TestNextIndex(t *testing.T) {
 }
 
 func TestGetNextEligibleNode(t *testing.T) {
+	// test data preparation
 	urls := []string{
 		"http://localhost:8001",
 		"http://localhost:8002",
@@ -43,12 +44,12 @@ func TestGetNextEligibleNode(t *testing.T) {
 		lastUsedIndex: -1,
 		Nodes:         nodes,
 	}
-
 	wants := []string{
 		"http://localhost:8002",
 		"http://localhost:8003",
 		"http://localhost:8002",
 	}
+
 	for _, want := range wants {
 		n := rr.GetNextEligibleNode(nil)
 		got := n.URL.String()

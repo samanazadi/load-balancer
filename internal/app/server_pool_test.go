@@ -46,7 +46,7 @@ func TestNewServerPool(t *testing.T) {
 		}
 		nodes = append(nodes, &n)
 	}
-	pool := ServerPool{Nodes: nodes}
+	pool := NewServerPool(nodes, nil)
 
 	if len(pool.Nodes) != len(urls) {
 		t.Errorf("ServerPool.newServerPool(%d nodes) caused %d nodes", len(urls), len(pool.Nodes))

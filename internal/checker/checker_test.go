@@ -56,7 +56,7 @@ func TestTCPCheckUnavailableServer(t *testing.T) {
 		Timeout: 1,
 	}
 
-	u, _ := url.Parse(server.URL + "1")
+	u, _ := url.Parse(server.URL + "1") // distort address to be unavailable
 	if got := hc.Check(u); got {
 		t.Errorf("TCP{timeout: %d} should have failed", 1)
 	}
