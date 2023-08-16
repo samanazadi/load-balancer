@@ -97,3 +97,25 @@ func TestNewRoundRobin(t *testing.T) {
 		t.Errorf("NewRoundRobin().lastUsedIndex = %d, want -1", got)
 	}
 }
+
+func BenchmarkGetNextEligibleNode(b *testing.B) {
+	// setup
+	const count = 100
+	nodes := make([]*node.Node, 0, count)
+	for i := 0; i < count; i++ {
+		n := &node.Node{
+			URL: nil,
+		}
+		n.SetAlive(i%2 == 0)
+		nodes = append(nodes, n)
+	}
+	rr := RoundRobin{
+		lastUsedIndex: -1,
+		Nodes:         nodes,
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		rr.GetNextEligibleNode(nil)
+	}
+}
