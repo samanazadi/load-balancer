@@ -1,2 +1,4 @@
 {
+	"replicas": 2,
+	"hashFunc" : "crc32"
 }

@@ -17,8 +17,7 @@
 		}
 	},
 	"algorithm": {
-		"name": "rr",
-		"params": {}
+		"name": "ch"
 	},
 	"checker": {
 		"name": "tcp"
