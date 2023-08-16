@@ -19,4 +19,3 @@ Build and run `cmd/server/main.go`. Listening port, nodes and other configs will
 - Nodes statistics
 - Other algorithms: weighted round-robin, consistent hashing, the least connections
 - Other types of configs: yaml, OS environment variables, command line flag
-- Graceful shutdown
