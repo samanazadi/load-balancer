@@ -32,7 +32,10 @@ func New(cfg *configs.Config) (ConnectionChecker, error) {
 		return chk, nil
 
 	case HTTPType:
-		path, keyPhrase := HTTPCheckerParamDecode(cfg.Checker.Params)
+		path, keyPhrase, err := HTTPCheckerParamDecode(cfg.Checker.Params)
+		if err != nil {
+			return nil, err
+		}
 		chk = HTTP{
 			Path:      path,
 			KeyPhrase: keyPhrase,
@@ -95,8 +98,14 @@ func (c HTTP) Check(url *url.URL) bool {
 	return strings.Contains(string(body), c.KeyPhrase)
 }
 
-func HTTPCheckerParamDecode(m map[string]any) (path, keyPhrase string) {
-	path = m["path"].(string)
-	keyPhrase = m["keyPhrase"].(string)
+func HTTPCheckerParamDecode(m map[string]any) (path, keyPhrase string, err error) {
+	path, ok := m["path"].(string)
+	if !ok {
+		return "", "", fmt.Errorf("http checker invalid path ")
+	}
+	keyPhrase, ok = m["keyPhrase"].(string)
+	if !ok || keyPhrase == "" {
+		return "", "", fmt.Errorf("http checker invalid keyPhrase ")
+	}
 	return
 }

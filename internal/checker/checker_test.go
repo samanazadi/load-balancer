@@ -164,7 +164,11 @@ func TestHTTPCheckerParamDecode(t *testing.T) {
 		"path":      "some-path",
 		"keyPhrase": "key",
 	}
-	path, keyPhrase := HTTPCheckerParamDecode(params)
+	path, keyPhrase, err := HTTPCheckerParamDecode(params)
+
+	if err != nil {
+		t.Errorf("checker.HTTPCheckerParamDecode(map[path=some-path, key]) cannot be decoded")
+	}
 
 	if path != "some-path" {
 		t.Errorf("checker.HTTPCheckerParamDecode(map[path=some-path]).path = %s", path)
