@@ -98,7 +98,7 @@ func TestNewRoundRobin(t *testing.T) {
 	}
 }
 
-func BenchmarkGetNextEligibleNode(b *testing.B) {
+func BenchmarkRRGetNextEligibleNode(b *testing.B) {
 	// setup
 	const count = 100
 	nodes := make([]*node.Node, 0, count)
@@ -109,10 +109,9 @@ func BenchmarkGetNextEligibleNode(b *testing.B) {
 		n.SetAlive(i%2 == 0)
 		nodes = append(nodes, n)
 	}
-	rr := RoundRobin{
-		lastUsedIndex: -1,
-		Nodes:         nodes,
-	}
+
+	rr := NewRoundRobin()
+	rr.SetNodes(nodes)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
