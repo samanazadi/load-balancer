@@ -2,7 +2,7 @@
 A simple load balancer written in Go.
 
 # Config Files
-To run the project copy json config files from `configs` to `/etc/load-balancer/` and edit them:
+- Use command line flag "-c" for configs directory. Default configs directory path is `/etc/load-balancer/`.
 - Change checker name in `config.json` to one of "tcp" or "http"
   - Change `checker.json` accordingly.
     - TCP checker doesn't need any parameters.
