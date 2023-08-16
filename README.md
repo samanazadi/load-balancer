@@ -1,6 +1,13 @@
 # Go Load Balancer
 A simple load balancer written in Go.
 
+# Features
+- Active and passive health check
+- Multiple algorithms support
+- Multiple node health checker support
+- Unit and integration tests
+- Benchmarks for every algorithm
+
 # Config Files
 - Use command line flag "-c" for configs directory. Default configs directory path is `/etc/load-balancer/`.
 - Change checker name in `config.json` to one of "tcp" or "http"
