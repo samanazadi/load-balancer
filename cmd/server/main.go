@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/samanazadi/load-balancer/configs"
 	"github.com/samanazadi/load-balancer/internal/algorithm"
 	"github.com/samanazadi/load-balancer/internal/app"
@@ -14,8 +15,13 @@ func main() {
 	// logging
 	logging.Init()
 
+	// command line flags
+	var cfgPath string //configs directory path
+	flag.StringVar(&cfgPath, "c", "/etc/load-balancer", "configs directory")
+	flag.Parse()
+
 	// config
-	cfg, err := configs.New()
+	cfg, err := configs.New(cfgPath)
 	if err != nil {
 		logging.Logger.Fatal(err)
 	}

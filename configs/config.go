@@ -4,12 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-)
-
-const (
-	configPath    = "/etc/load-balancer/config.json"
-	algorithmPath = "/etc/load-balancer/algorithm.json"
-	checkerPath   = "/etc/load-balancer/checker.json"
+	"path/filepath"
 )
 
 type ActiveHealthCheck struct {
@@ -45,8 +40,13 @@ type Config struct {
 	Checker     Checker     `json:"checker"`
 }
 
-func New() (*Config, error) {
+func New(cfgPath string) (*Config, error) {
 	var config Config
+	var (
+		configPath    = filepath.Join(cfgPath, "config.json")
+		algorithmPath = filepath.Join(cfgPath, "algorithm.json")
+		checkerPath   = filepath.Join(cfgPath, "checker.json")
+	)
 
 	// read config.json file
 	configBytes, err := os.ReadFile(configPath)
