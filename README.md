@@ -7,9 +7,10 @@ A simple load balancer written in Go.
   - Change `checker.json` accordingly.
     - TCP checker doesn't need any parameters.
     - HTTP checker needs keys "path" and "keyPhrase" in the json file. 
-- Change algorithm name in `config.json` based on required algorithm. At the time only round-robin algorithm is implemented ("rr").
+- Change algorithm name in `config.json` to one of "rr" (round-robin) or "ch" (consistent hashing)
   - Change `algorithm.json` accordingly.
     - Round-robin algorithm doesn't need any parameters.
+    - Consistent hashing need two parameters: "replicas" (e.g. 100) and "hashFunc" (e.g. "crc32")
 
 # How to Use
 Build and run `cmd/server/main.go`. Listening port, nodes and other configs will be read from config files.
@@ -17,5 +18,4 @@ Build and run `cmd/server/main.go`. Listening port, nodes and other configs will
 # Todo
 - Dockerization
 - Nodes statistics
-- Other algorithms: weighted round-robin, consistent hashing, the least connections
 - Other types of configs: yaml, OS environment variables, command line flag
