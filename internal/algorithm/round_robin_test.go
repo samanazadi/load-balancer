@@ -59,7 +59,7 @@ func TestGetNextEligibleNode(t *testing.T) {
 	}
 }
 
-func TestSetNodes(t *testing.T) {
+func TestRRSetNodes(t *testing.T) {
 	urls := []string{
 		"http://localhost:8001",
 		"http://localhost:8002",
