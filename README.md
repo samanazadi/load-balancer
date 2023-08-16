@@ -11,6 +11,9 @@ To run the project copy json config files from `configs` to `/etc/load-balancer/
   - Change `algorithm.json` accordingly.
     - Round-robin algorithm doesn't need any parameters.
 
+# How to Use
+Build and run `cmd/server/main.go`. Listening port, nodes and other configs will be read from config files.
+
 # Todo
 - Dockerization
 - Nodes statistics
