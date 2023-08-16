@@ -1,0 +1,26 @@
+{
+	"port": 8000,
+	"nodes": [
+		"http://localhost:8001",
+		"http://localhost:8002",
+		"http://localhost:8003",
+		"http://localhost:8004"
+	],
+	"healthCheck": {
+		"active": {
+			"maxRetry": 3,
+			"retryDelay": 100
+		},
+		"passive": {
+			"period": 20,
+			"timeout": 3
+		}
+	},
+	"algorithm": {
+		"name": "rr",
+		"params": {}
+	},
+	"checker": {
+		"name": "tcp"
+	}
+}
