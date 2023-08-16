@@ -11,7 +11,7 @@ A simple load balancer written in Go.
   - Change `algorithm.json` accordingly.
     - Round-robin algorithm doesn't need any parameters.
     - Consistent hashing need two parameters: "replicas" (e.g. 100) and "hashFunc" (e.g. "crc32")
-
+- Sample config files can be found in `configs` directory
 # How to Use
 Build and run `cmd/server/main.go`. Listening port, nodes and other configs will be read from config files.
 
