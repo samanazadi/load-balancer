@@ -9,6 +9,7 @@ import (
 
 const (
 	RRType = "rr"
+	CHType = "ch"
 )
 
 // Algorithm is a balancing algorithm like round-robin and consistent hashing
@@ -20,8 +21,9 @@ type Algorithm interface {
 func New(cfg *configs.Config) (Algorithm, error) {
 	switch cfg.Algorithm.Name {
 	case RRType:
-		rr := NewRoundRobin()
-		return rr, nil
+		return NewRoundRobin(), nil
+	case CHType:
+		return NewConsistentHashing(cfg)
 	default:
 		return nil, fmt.Errorf("invalid algorithm: %s", cfg.Algorithm.Name)
 	}
